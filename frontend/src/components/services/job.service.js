@@ -40,11 +40,13 @@ export const editProfile=async(jobData)=>{
       if(jobData.profilePicture){
         formData.append("profilePicture",jobData.profilePicture)
       }
-      const response=await axiosInstance.post("api/v1/edit-profile",formData,{
-        headers:{
-          "Content-Type":"multipart/form-data",
-        }
-      })
+      const response=await axiosInstance.post("api/v1/edit-profile",formData,
+      //   {
+      //   headers:{
+      //     "Content-Type":"multipart/form-data",
+      //   }
+      // }
+    )
       return response?.data
   } catch (error) {
     console.log(error.message);
@@ -68,11 +70,11 @@ export const editAdminProfile = async (jobData) => {
     const response = await axiosInstance.post(
       "api/v1/edit-admin-profile",
       formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      // {
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //   },
+      // }
     );
 
     return response?.data;

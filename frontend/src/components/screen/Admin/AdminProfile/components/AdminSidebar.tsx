@@ -15,6 +15,8 @@ interface PersonalInformationProps {
 export const AdminSidebar: React.FC<PersonalInformationProps> = ({ adminProfile }) => {
   const router = useRouter();
 
+  console.log("hello baby",adminProfile?.profilePicture)
+
   const userplaceholder = adminProfile?.name.split(" ").map((n) => n[0]).join("");
   return (
     <Card>

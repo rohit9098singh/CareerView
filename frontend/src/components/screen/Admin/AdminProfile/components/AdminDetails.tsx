@@ -32,7 +32,7 @@ export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile,
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
+      phoneNumber: "",
       location: "",
       bio: "",
       profilePicture: "",
@@ -46,7 +46,7 @@ export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile,
       form.reset({
         name: adminProfile?.name || "",
         email: adminProfile?.email || "",
-        phone: adminProfile?.phoneNumber || "",
+        phoneNumber: adminProfile?.phoneNumber || "",
         location: adminProfile?.location || "",
         bio: adminProfile?.bio || "",
         profilePicture: "",
@@ -131,7 +131,7 @@ export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile,
                     <Input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => field.onChange(e.target.files)}
+                      onChange={(e) => field.onChange(e.target.files?.[0])}
                       disabled={!isEditMode}
                     />
                   </FormControl>
@@ -154,7 +154,7 @@ export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile,
             />
             <FormField
               control={form.control}
-              name="phone"
+              name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>

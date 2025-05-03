@@ -3,7 +3,7 @@ import { z } from "zod";
 export const personalInfoSchema = z.object({
   name: z.string().min(1, "Full name is required"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number is required"),
+  phoneNumber: z.string().min(10, "Phone number is required"),
   location: z.string().min(1, "Location is required"),
   bio: z.string().max(500, "Bio must be under 500 characters"),
   skills: z

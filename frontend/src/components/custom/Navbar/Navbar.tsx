@@ -72,7 +72,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div
           onClick={() =>
-            router.push(userData?.role === "student" ? "/student/Home" : "/admin/Home")
+            router.push(userData?.role === "userg" ? "/student/Home" : "/admin/Home")
           }
           className="flex items-center cursor-pointer"
         >

@@ -38,7 +38,7 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
+      phoneNumber: "",
       location: "",
       bio: "",
       skills: [""],
@@ -60,7 +60,7 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
           form.reset({
             name: data.name || "",
             email: data.email || "",
-            phone: data.phoneNumber || "",
+            phoneNumber: data.phoneNumber || "",
             location: data.location || "",
             bio: data.bio || "",
             skills: data.skills || [""],
@@ -85,9 +85,9 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
       if (response.status === "success") {
         toast.success("profile updated successfuly");
         form.reset();
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 1000); 
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000); 
       }
       else {
         toast.error("Error updating the profile please try again later")
@@ -204,7 +204,7 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
 
               <FormField
                 control={form.control}
-                name="phone"
+                name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
