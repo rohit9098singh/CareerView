@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { AppliedJobType } from '../../../../../../types/applyJobTypes'
 import { getAllAppliedJobs } from '@/components/services/job.service'
 import { getJobStatusBadgeClass } from '@/components/custom/customcolor/CustomColor'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const RecentApplications = () => {
     const [jobs, setJobs] = useState<AppliedJobType[]>([]);
@@ -29,11 +30,12 @@ const RecentApplications = () => {
         }
         fetchData();
     }, []);
-    console.log("from here",jobs)
+   
 
     const handleJobClick = (id: string) => {
         router.push(`/student/JobDetails/${id}`);
     };
+
 
     return (
         <Card>
@@ -48,21 +50,35 @@ const RecentApplications = () => {
                     jobs.slice(0, 5).map((application) => (
                         <div key={application.jobId} className='border rounded-lg p-4 cursor-pointer'>
                             <div className='flex justify-between items-start'>
-                                <div>
-                                    <h3 className='font-semibold'>
-                                        {application.jobTitle}
-                                    </h3>
-                                    <div className='flex items-center text-sm text-gray-500 mt-1'>
-                                        <Building className="h-3.5 w-3.5 mr-1" />
-                                        <span>{application.companyName}</span>
-                                        <span className="mx-2">•</span>
-                                        <MapPin className="h-3.5 w-3.5 mr-1" />
-                                        <span>{application.location}</span>
+                                <div className="flex items-start gap-3">
+                                    {/* Company Logo */}
+                                    <Avatar className="w-10 h-10 mt-1">
+                                        <AvatarImage src={application.companyLogo} alt={application.companyName || "Company"} />
+                                        <AvatarFallback>{application.companyName?.[0] || "C"}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <h3 className="font-semibold">{application.jobTitle}</h3>
+
+                                        <div className="flex items-center text-sm text-gray-500 mt-1 flex-wrap gap-x-2">
+                                            <div className="flex items-center">
+                                                <Building className="h-3.5 w-3.5 mr-1" />
+                                                <span>{application.companyName}</span>
+                                            </div>
+
+                                            <span className="mx-2">•</span>
+
+                                            <div className="flex items-center">
+                                                <MapPin className="h-3.5 w-3.5 mr-1" />
+                                                <span>{application.location}</span>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            Applied on {new Date(application.appliedAt).toLocaleDateString()}
+                                        </p>
                                     </div>
-                                    <p className='text-sm text-gray-500 mt-1'>
-                                        Applied on {new Date(application.appliedAt).toLocaleDateString()}
-                                    </p>
                                 </div>
+
                                 <Badge className={getJobStatusBadgeClass(application.status)}>
                                     <span className='px-4 py-1 font-semibold text-md'>
                                         {application.status.charAt(0).toUpperCase() + application.status.slice(1).replace("-", " ")}

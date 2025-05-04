@@ -15,6 +15,7 @@ import {
 import { AppliedJobType } from '../../../../../../types/applyJobTypes'
 import { getRecommendedJobs } from '@/components/services/job.service'
 import Link from 'next/link'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const RecommendedJobs = () => {
   const [selectedType, setSelectedType] = useState("all")
@@ -67,16 +68,28 @@ const RecommendedJobs = () => {
           filterJobs.map((job) => (
             <div key={job._id} className='border rounded-lg p-4'>
               <div className='flex items-start justify-between'>
-                <div>
-                  <h3 className='font-semibold'>{job.jobTitle}</h3>
-                  <div className='flex items-center text-sm text-gray-500 mt-1'>
-                    <Building className='h-3.5 w-3.5 mr-1' />
-                    <span className='mr-2'>{job.companyName}</span>
-                    <span>.</span>
-                    <MapPin className='h-3.5 w-3.5 mr-1 ml-2' />
-                    <span>{job.location}</span>
+                <div className="flex items-start gap-3">
+                  <Avatar className="w-10 h-10 mt-1">
+                    <AvatarImage src={job.companyLogo} alt={job.companyName || "Company"} />
+                    <AvatarFallback>{job.companyName?.[0] || "C"}</AvatarFallback>
+                  </Avatar>
+
+                  <div>
+                    <h3 className="font-semibold">{job.jobTitle}</h3>
+                    <div className="flex items-center text-sm text-gray-500 mt-1 flex-wrap gap-x-2">
+                      <div className="flex items-center">
+                        <Building className="h-3.5 w-3.5 mr-1" />
+                        <span>{job.companyName}</span>
+                      </div>
+                      <span className="mx-2 text-gray-400">•</span>
+                      <div className="flex items-center">
+                        <MapPin className="h-3.5 w-3.5 mr-1" />
+                        <span>{job.location}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
                 <div>
                   <Badge
                     className={

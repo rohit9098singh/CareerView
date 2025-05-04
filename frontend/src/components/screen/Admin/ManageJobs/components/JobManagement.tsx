@@ -101,15 +101,15 @@ export default function JobManagement() {
                         <DialogTitle>{""}</DialogTitle>
                         {selectedJob && <EditJobForm
                           jobData={{
-                            id:selectedJob._id || "",
+                            jobId:selectedJob._id || "",
                             jobTitle: selectedJob.jobTitle || "",
                             companyName: selectedJob.companyName || "",
                             industryType: selectedJob.industryType || "",
-                            workplaceType: selectedJob.workPlace || "",
+                            workPlace: selectedJob.workPlace || "",
                             foundedYear: selectedJob.foundedYear || "",
                             location: selectedJob.location || "",
                             jobType: selectedJob.jobType || "",
-                            jobStatus: selectedJob.JobStatus || "", 
+                            JobStatus: selectedJob.JobStatus || "", 
                             salaryRange: selectedJob.salaryRange || "",
                             experienceRequired: selectedJob.experienceRequired || "",
                             skills: Array.isArray(selectedJob.skills) ? selectedJob.skills.join(", ") : selectedJob.skills || "",
@@ -118,7 +118,7 @@ export default function JobManagement() {
                             applicationDeadLine: selectedJob.applicationDeadLine || "",
                             companyBenefits: selectedJob.companyBenefits || "",
                             aboutCompany: selectedJob.aboutCompany || "",
-                            logo: null, 
+                            companyLogo: null, 
                           }}
                         />}
                       </SheetContent>

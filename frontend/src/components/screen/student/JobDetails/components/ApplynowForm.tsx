@@ -103,6 +103,7 @@ const ApplynowForm = () => {
                     />
 
                     <Button type="submit" className="w-full" disabled={loading}>
+                        
                         {loading ? "Applying..." : "Apply Now"}
                     </Button>
 

@@ -9,6 +9,8 @@ import Pagination from "@/components/custom/Pagination/Pagination"
 import { AppliedJobType } from "../../../../../../types/applyJobTypes"
 import { getJobStatusBadgeClass } from "@/components/custom/customcolor/CustomColor"
 import { formatDateInDDMMYYY } from "@/lib/utils"
+import Image from "next/image"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface Props {
   jobs: AppliedJobType[];
@@ -33,6 +35,8 @@ const AppliedJobCards: React.FC<Props> = ({ jobs }) => {
   const handleJobDetailsClick = (id: string) => {
     router.push(`/student/JobDetails/${id}`)
   }
+
+
 
   return (
     <div className="space-y-4">
@@ -59,16 +63,20 @@ const AppliedJobCards: React.FC<Props> = ({ jobs }) => {
                     <div className="space-y-1.5">
                       <h2 className="text-xl font-semibold">{job.jobTitle}</h2>
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-                        <div className="flex items-center">
-                          <Building2 className="mr-1 h-3.5 w-3.5" />
-                          <span>{job.companyName}</span>
+                        <div className="flex items-center space-x-2">
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage src={job?.companyLogo} alt={job?.companyName || "Company"} />
+                            <AvatarFallback>{job?.companyName?.[0] || "C"}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{job.companyName}</span>
                         </div>
-                        <div className="flex items-center">
+                        <div className="flex items-center space-x-1">
                           <MapPin className="mr-1 h-3.5 w-3.5" />
                           <span>{job.location}</span>
                         </div>
                       </div>
                     </div>
+
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Calendar className="mr-1.5 h-4 w-4" />
                       <span>Applied on {formatDateInDDMMYYY(job.appliedAt)}</span>
@@ -101,11 +109,11 @@ const AppliedJobCards: React.FC<Props> = ({ jobs }) => {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className={`rounded-full px-3 py-1 text-xs font-medium ${getJobStatusBadgeClass(job.status)}`}>
-                         {job.status}
+                        {job.status}
                       </div>
 
                       <Button
-                        onClick={() => { handleJobDetailsClick(job.jobId) }} 
+                        onClick={() => { handleJobDetailsClick(job.jobId) }}
                         variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                         <ChevronRight className="h-4 w-4" />
                       </Button>

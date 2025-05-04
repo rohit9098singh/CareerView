@@ -1,6 +1,7 @@
 import express from "express";
 import {
   adminStats,
+  editJob,
   getAllAppliedJobs,
   getAllJobs,
   getAllSavedJobs,
@@ -18,6 +19,7 @@ import { changeApplicationStatus, applyJob, getApplicationOfJobByJobId, editProf
 const router = express.Router();
 
 router.post( "/post-job",authenticateUser,multerMiddleware.single("companyLogo"),postJob);
+router.post( "/edit-job",authenticateUser,multerMiddleware.single("companyLogo"),editJob);
 router.get("/get-all-jobs",authenticateUser,getAllJobs)
 router.get("/latest-jobs",getLatestJobs);
 router.get("/get-recomendation",authenticateUser,getJobSuggestions)

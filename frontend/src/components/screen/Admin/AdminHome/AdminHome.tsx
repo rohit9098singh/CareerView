@@ -35,7 +35,9 @@ const AdminHome = () => {
         console.error("Error fetching data:", error);
       }
     }
+    fetchData()
   }, [])
+  console.log("is the name not comming ",user)
 
   console.log("what are they here ",stats)
   return (

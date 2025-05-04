@@ -83,6 +83,90 @@ export const postJob = async (req, res) => {
   }
 };
 
+export const editJob = async (req, res) => {
+  const {
+    jobId, 
+    jobTitle,
+    companyName,
+    industryType,
+    workPlace,
+    foundedYear,
+    location,
+    jobType,
+    JobStatus, // Use capitalized field to match the schema
+    salaryRange,
+    experienceRequired,
+    skills,
+    applicationDeadLine,
+    companySize,
+    JobDescription, // Use capitalized field to match the schema
+    companyBenefits,
+    aboutCompany,
+  } = req.body;
+
+  let imageUrl = "";
+
+  try {
+    const userId = req?.id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return response(res, 400, "User not found");
+    }
+
+    if (user.role !== "admin") {
+      return response(res, 403, "You're not allowed to edit the job");
+    }
+
+    const job = await Job.findById(jobId);
+
+    if (!job) {
+      return response(res, 404, "Job not found");
+    }
+
+    if (job.postedBy.toString() !== userId) {
+      return response(res, 403, "You can only edit jobs posted by you");
+    }
+
+    if (req.file) {
+      try {
+        const result = await uploadFileToCloudinary(req.file);
+        imageUrl = result.secure_url;
+      } catch (uploadError) {
+        console.error(uploadError);
+        return response(res, 500, "Failed to upload company logo");
+      }
+    }
+     
+    // Updating fields only if they are provided
+    job.jobTitle = jobTitle || job.jobTitle;
+    job.companyName = companyName || job.companyName;
+    job.industryType = industryType || job.industryType;
+    job.workPlace = workPlace || job.workPlace;
+    job.foundedYear = foundedYear || job.foundedYear;
+    job.location = location || job.location;
+    job.jobType = jobType || job.jobType;
+    job.JobStatus = JobStatus || job.JobStatus; // Use capitalized field
+    job.salaryRange = salaryRange || job.salaryRange;
+    job.experienceRequired = experienceRequired || job.experienceRequired;
+    job.skills = skills || job.skills;
+    job.applicationDeadLine = applicationDeadLine || job.applicationDeadLine;
+    job.companySize = companySize || job.companySize;
+    job.JobDescription = JobDescription || job.JobDescription; // Use capitalized field
+    job.companyBenefits = companyBenefits || job.companyBenefits;
+    job.aboutCompany = aboutCompany || job.aboutCompany;
+    job.companyLogo = imageUrl || job.companyLogo; // Keep existing logo if no new image uploaded
+
+    await job.save();
+
+    return response(res, 200, "Job updated successfully", job);
+  } catch (error) {
+    console.error(error);
+    return response(res, 500, "Failed to update the job", error.message);
+  }
+};
+
+
 export const getAllJobs=async(req,res)=>{
      try {
            const jobs=await Job.find();
@@ -130,7 +214,7 @@ export const getJobSuggestions = async (req, res) => {
     })
       .sort({ createdAt: -1 }) 
       .limit(10)
-      .select('jobTitle companyName location jobType JobDescription salaryRange');
+      .select('jobTitle companyName location jobType JobDescription salaryRange companyLogo');
 
 
     return response(res, 200, "Recommended jobs fetched successfully", suggestions);
@@ -145,19 +229,33 @@ export const getJobSuggestions = async (req, res) => {
 
 export const getJobDetails = async (req, res) => {
   const { jobId } = req.params;
-  console.log(jobId);
+  const userId = req.id;
   try {
     const jobDetails = await Job.findById(jobId).populate(
       "postedBy",
       "name email role"
     );
 
-    const appliedCount = await JobApplication.countDocuments({ jobId });
     if (!jobDetails) {
       return response(res, 400, "Job not found", jobDetails.message);
     }
 
-    return response(res, 200, "Job Details fetched successfully", {jobDetails,appliedCount});
+    const appliedCount = await JobApplication.countDocuments({ jobId });
+
+    let isApplied=false;
+
+    if(userId){
+      const user=await User.findById(userId);
+
+      if(user){
+        isApplied=user.appliedJobs.some(
+          (job)=>job.jobId.toString()=== jobId
+        )
+      }
+    }
+
+
+    return response(res, 200, "Job Details fetched successfully", {jobDetails,appliedCount,isApplied});
   } catch (error) {
     return response(res, 500, "Internal server error", error.message);
   }
@@ -312,7 +410,7 @@ export const getAllAppliedJobs = async (req, res) => {
 
     const user = await User.findById(userId).populate({
       path: "appliedJobs.jobId", 
-      select: "jobTitle companyName location jobType salaryRange JobDescription skills" 
+      select: "jobTitle companyName location jobType salaryRange JobDescription skills companyLogo" 
     }).sort({ "appliedJobs.createdAt": -1 });;
 
       if(!user){

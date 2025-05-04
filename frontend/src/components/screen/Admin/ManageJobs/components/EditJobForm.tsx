@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import { editFormSchema } from './validation/validation';
 import { Textarea } from '@/components/ui/textarea';
+import { editJob } from '@/components/services/job.service';
 
 type EditFormType = z.infer<typeof editFormSchema>;
 
@@ -20,14 +21,31 @@ interface EditJobFormProps {
 
 const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
 
+  console.log(jobData)
+
+  console.log("first",jobData)
   const form = useForm<EditFormType>({
     resolver: zodResolver(editFormSchema),
     defaultValues: jobData,
   });
 
-  const onSubmit = (data: EditFormType) => {
+  const onSubmit =async (data: EditFormType) => {
     console.log('Updated job data:', data);
-    toast.success('Job updated successfully!');
+    try {
+         const response=await editJob(data);
+         console.log("hello eorld")
+         if(response.status=== "success"){
+          toast.success("job updated successfully !");
+          setTimeout(()=>{
+             window.location.reload();
+          },1000)
+         }
+         else{
+          console.log("something went wrong while editing",response?.error)
+         }
+    } catch (error:any) {
+        toast.error("something went wrong",error.message)
+    }
   };
 
   return (
@@ -63,7 +81,7 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
             />
             <FormField
               control={form.control}
-              name="logo"
+              name="companyLogo"
               render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
                   <FormLabel>
@@ -128,7 +146,7 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
             />
             <FormField
               control={form.control}
-              name="workplaceType"
+              name="workPlace"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
@@ -208,7 +226,7 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
             />
             <FormField
               control={form.control}
-              name="jobStatus"
+              name="JobStatus"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>

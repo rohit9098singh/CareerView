@@ -22,6 +22,7 @@ const FindJob = () => {
     fetchJobs();
   }, []);
 
+  console.log(jobsData)
   const filteredJobs = jobsData?.filter((job:any) =>
       job?.jobTitle?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job?.companyName?.toLowerCase().includes(searchQuery.toLowerCase()) ||

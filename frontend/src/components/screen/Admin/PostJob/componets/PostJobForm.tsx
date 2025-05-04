@@ -47,6 +47,7 @@ const PostJobForm = () => {
     const response = await postJob(data)
     if (response) {
       toast.success("job posted successfully")
+      form.reset();
     } else {
       toast.error("error posting the job")
     }

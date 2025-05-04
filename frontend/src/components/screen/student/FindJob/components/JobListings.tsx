@@ -1,5 +1,6 @@
 "use client"
 import Pagination from '@/components/custom/Pagination/Pagination'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Building, MapPin } from 'lucide-react'
@@ -11,6 +12,7 @@ import React, { useState } from 'react'
 const JOBS_PER_PAGE = 5;
 
 const JobListings: React.FC<any> = ({ jobs }) => {
+
 
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -28,18 +30,32 @@ const JobListings: React.FC<any> = ({ jobs }) => {
     router.push(`/student/JobDetails/${id}`)
   }
 
-  // console.log(currentJobs)
+  // console.log("the logo might also come",jobs)
+  console.log("the logo might also come", currentJobs)
   return (
     <div className='space-y-6'>
-      {currentJobs?.map((job: any,index:number) => (
+      {currentJobs?.map((job: any, index: number) => (
         <div
           key={index}
           className='bg-white p-6 rounded-lg shadow-sm border border-gray-100 cursor-pointer'
         >
-          <div className='flex justify-between '>
-            <h2 className="text-xl font-semibold text-gray-900">{job?.jobTitle}</h2>
-            <Badge className='px-4 bg-purple-900 text-white'>{job?.location}</Badge>
+          <div className="flex justify-between items-start flex-wrap gap-3">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={job?.companyLogo} alt={job?.companyName || "Company"} />
+                <AvatarFallback>{job?.companyName?.[0] || "C"}</AvatarFallback>
+              </Avatar>
+
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-gray-800">{job?.companyName}</span>
+                <h2 className="text-lg md:text-xl font-semibold text-gray-900">{job?.jobTitle}</h2>
+              </div>
+           </div>
+            <Badge className="px-4 py-1 bg-purple-900 text-white whitespace-nowrap">
+              {job?.location}
+            </Badge>
           </div>
+
           <div className="flex items-center gap-1 mt-1 text-gray-600">
             <Building className="h-4 w-4" />
             <span className="text-sm">{job?.companyName}</span>

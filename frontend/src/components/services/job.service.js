@@ -19,11 +19,32 @@ export const postJob = async (jobData) => {
       },
     });
 
-    return response.data;
+    return response?.data;
   } catch (error) {
     console.log(error.message);
   }
 };
+
+export const editJob=async(jobData)=>{
+  try {
+    console.log("got allded ")
+      const formData=new FormData();
+
+      Object.keys(jobData).forEach((key)=>{
+        if(key !=="companyLogo" && jobData[key] !==null){
+             formData.append(key,jobData[key]);
+        }
+      })
+      if(jobData.logo){
+        formData.append("companyLogo",jobData.companyLogo)
+      }
+
+      const response=await axiosInstance.post("/api/v1/edit-job",formData)
+      return response?.data
+  } catch (error) {
+    
+  }
+}
 
 export const editProfile=async(jobData)=>{
   try {
