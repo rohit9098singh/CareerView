@@ -26,11 +26,14 @@ import {
 } from "@/components/ui/select";
 import { useParams } from "next/navigation";
 import {
+  getAllAppliedJobs,
     getApplicationsByJobId,
+    getRecommendedJobs,
     updateApplicationStatus,
 } from "@/components/services/job.service";
 import { Application } from "../../../../../../types/allApplicantsData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import toast from "react-hot-toast";
 
 const ApplicantsTable: React.FC = () => {
     const [applicants, setApplicants] = useState<Application[]>([]);

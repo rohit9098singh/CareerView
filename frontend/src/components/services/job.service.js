@@ -236,17 +236,21 @@ export const getAdminStats = async () => {
 
 
 
-export const updateApplicationStatus = async (applicantId, status) => {
+export const updateApplicationStatus = async (jobId, { status, applicantId }) => {
   try {
-    const response = await axiosInstance.put(`/api/v1/change-application-status/${applicantId}`, {
-      status,
-      applicantId
-    });
+    const response = await axiosInstance.put(
+      `/api/v1/change-application-status/${jobId}`,
+      {
+        status,
+        applicantId,
+      }
+    );
     return response?.data;
   } catch (error) {
-    console.log(error.message);
+    console.error("Error updating application status:", error);
   }
 };
+
 
 
 export const getApplicationsByJobId = async (jobId) => {

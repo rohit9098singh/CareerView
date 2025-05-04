@@ -16,6 +16,7 @@ import { AppliedJobType } from '../../../../../../types/applyJobTypes'
 import { getRecommendedJobs } from '@/components/services/job.service'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import ApplynowForm from '../../JobDetails/components/ApplynowForm'
 
 const RecommendedJobs = () => {
   const [selectedType, setSelectedType] = useState("all")
@@ -106,12 +107,10 @@ const RecommendedJobs = () => {
               <p className="text-sm font-medium mt-3">Salary: {job.salaryRange}</p>
 
               <div className="flex gap-2 mt-3">
-                <Link href=''>
-                  <Button size="sm" className="bg-purple-900 hover:bg-purple-950">
-                    Apply Now
-                  </Button>
-                </Link>
-                <Link href=''>
+                <Button  size="sm" className="bg-purple-900 hover:bg-purple-950">
+                  Apply Now
+                </Button>
+                <Link href={`/student/JobDetails/${job._id}`}>
                   <Button variant="outline" size="sm">
                     View Details
                   </Button>
