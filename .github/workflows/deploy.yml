@@ -1,104 +1,110 @@
 name: Deploy Next.js to EC2 with Nginx
 
-name: Deploy Next.js to EC2 with Nginx
-
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    # one place to change the folder name if you ever move it
+    env:
+      PROJECT_DIR: frontend
+      REMOTE_DIR: /home/ubuntu/careear-frontend   # <- keep your typo if the folder already exists
+      NODE_VERSION: "18"
+
     steps:
+    # 1️⃣  Checkout
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Setup Node.js 18
+    # 2️⃣  Node setup & cache
+    - name: Set up Node.js ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v3
       with:
-        node-version: 18
+        node-version: ${{ env.NODE_VERSION }}
 
     - name: Cache node_modules
       uses: actions/cache@v3
       with:
-        path: frontend/node_modules
+        path: ${{ env.PROJECT_DIR }}/node_modules
         key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
-        restore-keys: ${{ runner.os }}-node-
 
     - name: Install dependencies
-      working-directory: frontend
-      run: npm ci
+      working-directory: ${{ env.PROJECT_DIR }}
+      run: npm ci    # reproducible installs
 
+    # 3️⃣  Build
     - name: Cache Next.js build cache
       uses: actions/cache@v3
       with:
-        path: frontend/.next/cache
-        key: ${{ runner.os }}-nextjs-${{ hashFiles('frontend/package-lock.json') }}
-        restore-keys: ${{ runner.os }}-nextjs-
+        path: ${{ env.PROJECT_DIR }}/.next/cache
+        key: ${{ runner.os }}-next-${{ hashFiles('frontend/package-lock.json') }}
 
-    - name: Create .env file
-      working-directory: frontend
-      run: echo "NEXT_PUBLIC_BACKEND_URL=${{ vars.NEXT_PUBLIC_BACKEND_URL }}" > .env
+    - name: Inject env vars
+      working-directory: ${{ env.PROJECT_DIR }}
+      run: echo "NEXT_PUBLIC_BACKEND_URL=${{ vars.NEXT_PUBLIC_BACKEND_URL }}" >> .env
 
-    - name: Build Next.js application
-      working-directory: frontend
+    - name: Build Next.js app
+      working-directory: ${{ env.PROJECT_DIR }}
       run: npm run build
 
-    - name: Archive build artefacts
-      working-directory: frontend
-      run: tar -czf ../nextjs-build.tar.gz .next package.json package-lock.json .env
+    # 4️⃣  Package build artefacts (keeps repo slim on the server)
+    - name: Create build archive
+      run: |
+        tar -czf nextjs-build.tar.gz \
+          -C ${{ env.PROJECT_DIR }} .next package.json .env
 
-    - name: Install SSH & rsync
-      run: sudo apt-get update && sudo apt-get install -y openssh-client rsync
+    # 5️⃣  Copy to EC2
+    - name: Install SSH client
+      run: sudo apt-get update && sudo apt-get install -y openssh-client
 
     - name: Add EC2 to known_hosts
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
+      run: ssh-keyscan ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
 
-    - name: Upload artefacts to EC2 via rsync
+    - name: Upload build archive to EC2
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-        EC2_USER: ${{ secrets.EC2_USER }}
-        EC2_IP: ${{ secrets.EC2_IP }}
+        SSH_KEY: ${{ secrets.EC2_PASSWORD }}   # consider renaming this secret to EC2_SSH_KEY
       run: |
-        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
+        echo "$SSH_KEY" | tr -d '\r' > /tmp/ec2_key.pem
         chmod 600 /tmp/ec2_key.pem
-
-        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_IP \
-          "sudo mkdir -p /home/ubuntu/careear-frontend && sudo chown -R $EC2_USER:$EC2_USER /home/ubuntu/careear-frontend"
-
         rsync -avz --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" \
-          nextjs-build.tar.gz $EC2_USER@$EC2_IP:/home/ubuntu/careear-frontend/
+          nextjs-build.tar.gz \
+          ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:${{ env.REMOTE_DIR }}/
 
-    - name: Deploy on EC2
+    # 6️⃣  Deploy on the VM
+    - name: Unpack & start app on EC2
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-        EC2_USER: ${{ secrets.EC2_USER }}
-        EC2_IP: ${{ secrets.EC2_IP }}
+        SSH_KEY: ${{ secrets.EC2_PASSWORD }}
+        NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
       run: |
-        echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
+        echo "$SSH_KEY" | tr -d '\r' > /tmp/ec2_key.pem
         chmod 600 /tmp/ec2_key.pem
 
-        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_IP << 'EOF'
+        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no ${{
+          secrets.EC2_USER }}@${{ secrets.EC2_IP }} << 'EOF'
           set -e
-          cd /home/ubuntu/careear-frontend
 
+          REMOTE_DIR=${REMOTE_DIR}
+          cd $REMOTE_DIR
+
+          # unpack new build
           tar -xzf nextjs-build.tar.gz
+          rm nextjs-build.tar.gz
 
-          npm install --production --prefer-offline --no-audit
+          # install only production deps
+          npm ci --production
 
+          # PM2 (keeps app alive)
           if ! command -v pm2 >/dev/null 2>&1; then
-            sudo npm install -g pm2
+            sudo npm i -g pm2
           fi
 
-          pm2 stop careear-frontend || true
           pm2 delete careear-frontend || true
-          pm2 start npm --name careear-frontend -- run start -- -p 3000
-
+          pm2 start npm --name careear-frontend -- start -- -p 3000
           pm2 save
-          pm2 startup -u $(whoami) --hp /home/ubuntu
 
+          # reload nginx
           sudo systemctl restart nginx
         EOF
