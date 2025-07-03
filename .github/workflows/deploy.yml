@@ -1,5 +1,7 @@
 name: Deploy Next.js to EC2 with Nginx
 
+name: Deploy Next.js to EC2 with Nginx
+
 on:
   push:
     branches: [ main ]
@@ -8,35 +10,26 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Every `run:` step below executes inside frontend/
-    defaults:
-      run:
-        working-directory: frontend
-
     steps:
-    # 1️⃣  Checkout code
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2️⃣  Setup Node
     - name: Setup Node.js 18
       uses: actions/setup-node@v3
       with:
         node-version: 18
 
-    # 3️⃣  Cache node_modules
-    - name: Cache Node.js modules
+    - name: Cache node_modules
       uses: actions/cache@v3
       with:
         path: frontend/node_modules
         key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
         restore-keys: ${{ runner.os }}-node-
 
-    # 4️⃣  Install dependencies
     - name: Install dependencies
+      working-directory: frontend
       run: npm ci
 
-    # 5️⃣  Cache Next.js build cache for faster builds
     - name: Cache Next.js build cache
       uses: actions/cache@v3
       with:
@@ -44,29 +37,26 @@ jobs:
         key: ${{ runner.os }}-nextjs-${{ hashFiles('frontend/package-lock.json') }}
         restore-keys: ${{ runner.os }}-nextjs-
 
-    # 6️⃣  Inject env vars needed at build‑time
     - name: Create .env file
+      working-directory: frontend
       run: echo "NEXT_PUBLIC_BACKEND_URL=${{ vars.NEXT_PUBLIC_BACKEND_URL }}" > .env
 
-    # 7️⃣  Build Next.js app
     - name: Build Next.js application
+      working-directory: frontend
       run: npm run build
 
-    # 8️⃣  Archive artefacts we need on the server
     - name: Archive build artefacts
-      run: tar -czf nextjs-build.tar.gz .next package.json package-lock.json .env
+      working-directory: frontend
+      run: tar -czf ../nextjs-build.tar.gz .next package.json package-lock.json .env
 
-    # 9️⃣  Install SSH + rsync utilities (one call is faster)
     - name: Install SSH & rsync
       run: sudo apt-get update && sudo apt-get install -y openssh-client rsync
 
-    # 10️⃣  Add EC2 host key so ssh/rsync won’t ask
     - name: Add EC2 to known_hosts
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
 
-    # 11️⃣  Upload artefacts to EC2
     - name: Upload artefacts to EC2 via rsync
       env:
         SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
@@ -76,19 +66,12 @@ jobs:
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
         chmod 600 /tmp/ec2_key.pem
 
-        # ensure target dir exists & owned by ssh user
         ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_IP \
           "sudo mkdir -p /home/ubuntu/careear-frontend && sudo chown -R $EC2_USER:$EC2_USER /home/ubuntu/careear-frontend"
 
-        # sync .next, package files & .env
         rsync -avz --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" \
-          .next/ $EC2_USER@$EC2_IP:/home/ubuntu/careear-frontend/.next/
+          nextjs-build.tar.gz $EC2_USER@$EC2_IP:/home/ubuntu/careear-frontend/
 
-        rsync -avz --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" \
-          package.json package-lock.json .env \
-          $EC2_USER@$EC2_IP:/home/ubuntu/careear-frontend/
-
-    # 12️⃣  Deploy & restart via PM2
     - name: Deploy on EC2
       env:
         SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
@@ -102,15 +85,14 @@ jobs:
           set -e
           cd /home/ubuntu/careear-frontend
 
-          # install production deps (offline‑friendly)
+          tar -xzf nextjs-build.tar.gz
+
           npm install --production --prefer-offline --no-audit
 
-          # ensure PM2 exists
           if ! command -v pm2 >/dev/null 2>&1; then
             sudo npm install -g pm2
           fi
 
-          # restart app
           pm2 stop careear-frontend || true
           pm2 delete careear-frontend || true
           pm2 start npm --name careear-frontend -- run start -- -p 3000
@@ -118,7 +100,5 @@ jobs:
           pm2 save
           pm2 startup -u $(whoami) --hp /home/ubuntu
 
-          # reload nginx (assumes conf already proxies :3000)
           sudo systemctl restart nginx
         EOF
-
