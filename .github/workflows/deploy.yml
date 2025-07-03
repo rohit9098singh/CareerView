@@ -27,6 +27,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Install Dependencies
+       working-directory: frontend
         run: npm install --force
 
       - name: Cache Next.js Build Cache
