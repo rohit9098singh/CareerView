@@ -1,0 +1,111 @@
+name: Deploy Next.js to EC2 with Nginx
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Cache Node.js Modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        run: npm install --force
+
+      - name: Cache Next.js Build Cache
+        uses: actions/cache@v3
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
+
+      - name: Create .env File
+        run: |
+          echo "NEXT_PUBLIC_BACKEND_URL=${{ vars.NEXT_PUBLIC_BACKEND_URL }}" >> .env
+
+      - name: Build Next.js Application
+        run: npm run build
+
+      - name: Archive Build Artifacts
+        run: |
+          tar -czf nextjs-build.tar.gz .next package.json
+
+      - name: Install SSH Client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Ensure SSH Directory Exists
+        run: mkdir -p ~/.ssh
+
+      - name: Add EC2 to Known Hosts
+        run: ssh-keyscan ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
+
+      - name: Upload Artifacts to EC2 using rsync
+        env:
+          SCP_USER: ${{ secrets.EC2_USER }}
+          SCP_IP: ${{ secrets.EC2_IP }}
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PASSWORD }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem
+          ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $SCP_USER@$SCP_IP "sudo mkdir -p /home/ubuntu/careear-frontend && sudo chown -R $SCP_USER:$SCP_USER /home/ubuntu/careear-frontend"
+          rsync -avz --progress --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" .next/ $SCP_USER@$SCP_IP:/home/ubuntu/careear-frontend/.next/
+          rsync -avz --progress --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" package.json $SCP_USER@$SCP_IP:/home/ubuntu/careear-frontend/
+
+      - name: Deploy to EC2
+        env:
+          SCP_USER: ${{ secrets.EC2_USER }}
+          SCP_IP: ${{ secrets.EC2_IP }}
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PASSWORD }}
+          NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
+        run: |
+          ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $SCP_USER@$SCP_IP << EOF
+            cd /home/ubuntu/careear-frontend
+            
+            # Ensure npm install only production dependencies
+            sudo npm install --production
+            
+            # Create the .env file with the specified environment variables
+            sudo bash -c 'cat <<EOT > /home/ubuntu/careear-frontend/.env
+            NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
+            EOT'
+            
+            # Ensure PM2 is installed
+            if ! command -v pm2 &> /dev/null
+            then
+              sudo npm install -g pm2
+            fi
+            
+            # Stop and delete the previous application instance
+            pm2 stop careear-frontend || true
+            pm2 delete careear-frontend || true
+            
+            # Start the Next.js application on port 3000 with a specific name "careear-frontend"
+            pm2 start npm --name "careear-frontend" -- run start -- -p 3000
+            
+            # Ensure PM2 restarts the app on reboot
+            pm2 save
+            pm2 startup | sudo tee /etc/systemd/system/pm2-ubuntu.service
+            sudo systemctl enable pm2-ubuntu
+            sudo systemctl start pm2-ubuntu
+            
+            # Restart Nginx to apply changes
+            sudo systemctl restart nginx
+          EOF

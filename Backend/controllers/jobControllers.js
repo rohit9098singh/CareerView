@@ -76,6 +76,7 @@ export const postJob = async (req, res) => {
 
     await newJob.save();
 
+    // await sendNewJobPostedToAllUsers(newJob);
     return response(res, 201, "Job posted successfully", newJob);
   } catch (error) {
     console.error(error);
@@ -158,6 +159,7 @@ export const editJob = async (req, res) => {
     job.companyLogo = imageUrl || job.companyLogo; // Keep existing logo if no new image uploaded
 
     await job.save();
+
 
     return response(res, 200, "Job updated successfully", job);
   } catch (error) {

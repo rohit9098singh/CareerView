@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import User from "../models/userModel.js";
 
 dotenv.config();
 
@@ -47,12 +48,36 @@ export const sendVerificationToEmail = async (to, token) => {
 export const sendResetPasswordLinkToEmail = async (to, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
   const html = `
-    <h1>Welcome To Your BookKart! Reset Your Password</h1>
+    <h1>Welcome To Your CareerView ! Reset Your Password</h1>
     <p>You have requested to reset your password. Click the link below to set a new password:</p>
     <a href="${resetUrl}">Reset Password Here!</a>
     <p>If you didn't request this, please ignore this email and your password will remain the same.</p>
   `;
   await sendEmail(to, "Please Reset Your Password", html);
+};
+
+export const sendJobAppliedNotificationToAdmin = async (adminEmail, userName, jobTitle, coverLetter, resumeUrl) => {
+  const html = `
+    <h1>New Job Application</h1>
+    <p><strong>${userName}</strong> has applied for <strong>${jobTitle}</strong>.</p>
+    <p>Cover Letter:</p>
+    <blockquote>${coverLetter}</blockquote>
+    <p>Resume: <a href="${resumeUrl}">View Resume</a></p>
+  `;
+  await sendEmail(adminEmail, `New Application for ${jobTitle}`, html);
+};
+
+export const sendNewJobPostedToAllUsers = async (job) => {
+  const users = await User.find({}, "email");
+  const html = `
+    <h1>New Job Posted: ${job.title}</h1>
+    <p>${job.description}</p>
+    <p>Location: ${job.location}</p>
+    <a href="${process.env.FRONTEND_URL}/jobs/${job._id}">View Job</a>
+  `;
+  await Promise.all(users.map(user =>
+    user.email ? sendEmail(user.email, `New Job: ${job.title}`, html) : null
+  ));
 };
 
 

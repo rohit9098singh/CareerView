@@ -58,7 +58,7 @@ export const applyJob = async (req, res) => {
       });
   
       await user.save();
-  
+
       return response(res, 201, "Job applied successfully",application);
     } catch (error) {
       console.error(error);
