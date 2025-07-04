@@ -24,7 +24,7 @@ export default function JobManagement() {
   const [jobs, setJobs] = useState<jobDataPayloadType[]>([]);
   const [jobToDelete, setJobToDelete] = useState<jobDataPayloadType | null>(null);
   const [selectedJob, setSelectedJob] = useState<jobDataPayloadType | null>(null); // Track selected job for editing
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
 
   const router=useRouter();
 
@@ -34,7 +34,7 @@ export default function JobManagement() {
 
   useEffect(() => {
     const fetchAllPostedJobs = async () => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const response = await getAllJobs();
         if (response.status === "success") {
@@ -45,7 +45,7 @@ export default function JobManagement() {
       } catch (error) {
         console.error("Fetch failed:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
     fetchAllPostedJobs();

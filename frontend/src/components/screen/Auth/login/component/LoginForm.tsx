@@ -140,7 +140,7 @@ const LoginForm = () => {
                             Click a button to quickly log in with preset credentials
                         </p>
                         <p className="mt-4 text-sm">
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <button
                                 disabled={loading}
                                 onClick={() => router.push("/signup")}

@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Check, Eye, EyeOff, KeyRound } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
@@ -37,7 +36,7 @@ export default function ChangePasswordForm() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState("");
 
-  const router=useRouter();
+  const router = useRouter();
 
   const onSubmit = async (data: FormData) => {
     setError("")
@@ -62,13 +61,13 @@ export default function ChangePasswordForm() {
     setIsUpdating(true)
 
     try {
-       await changePassword(data)
+      await changePassword(data)
       setIsSuccess(true)
       toast.success("password updated successfully")
-      reset() 
+      reset()
       router.push("/")
-    } catch (error) {
-      setError("Failed to update password. Please try again.")
+    } catch (error: any) {
+      setError(error?.data?.message)
     } finally {
       setIsUpdating(false)
     }

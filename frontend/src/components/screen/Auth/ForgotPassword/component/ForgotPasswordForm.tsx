@@ -34,7 +34,7 @@ const ForgotPasswordForm = () => {
       setLoading(true);
       console.log("Reset password link sent to:", data.email);
 
-      const response = await forgotPassword(data.email);
+       await forgotPassword(data.email);
       setSuccess(true);
       toast.success("Password reset link sent successfully! Please check your inbox.");
     } catch (error) {
@@ -118,7 +118,7 @@ const ForgotPasswordForm = () => {
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
               <h3 className="text-xl font-semibold text-gray-700">Reset Link Sent Successfully</h3>
               <p className="text-sm text-gray-500">
-                We've sent a password reset link to your email. Please check your inbox and follow the instructions to reset your password.
+                We&apos;ve sent a password reset link to your email. Please check your inbox and follow the instructions to reset your password.
               </p>
               <Button
                 onClick={handleBackToForm}

@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Share, Bookmark, Heart, Share2, Copy } from "lucide-react"; // Assuming you have lucide-react installed
+import {  Bookmark, Heart, Share2, Copy } from "lucide-react"; // Assuming you have lucide-react installed
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DialogTitle } from "@/components/ui/dialog";
 import ApplynowForm from "./components/ApplynowForm";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -38,7 +38,7 @@ const JobDetails = () => {
           setAppliedCount(count || 0);
         }
 
-      } catch (error) {
+      } catch (error:any) {
         console.log("something went wrong", error)
       }
     };
@@ -59,8 +59,8 @@ const JobDetails = () => {
         toast.success("Job unsaved successfully!");
       }
       setIsSaved(response?.isSaved || !isSaved);
-    } catch (error) {
-      toast.error("Something went wrong, please try again.");
+    } catch (error:any) {
+      toast.error("Something went wrong, please try again.",error);
     }
   };
 

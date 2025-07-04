@@ -7,7 +7,6 @@ import {
     DollarSign,
     ExternalLink,
     MapPin,
-    Star,
     Trash2,
     Clock,
 } from "lucide-react";
@@ -28,7 +27,7 @@ type SavedJobType = {
 
 const SavedJobs = () => {
     const [savedJobs, setSavedJobs] = useState<SavedJobType[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    // const [error, setError] = useState<string | null>(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [jobToDelete, setJobToDelete] = useState<string | null>(null);
 
@@ -41,7 +40,8 @@ const SavedJobs = () => {
                 console.error("Failed to fetch jobs.");
             }
         } catch (err: any) {
-            setError(err.message);
+            // setError(err.message);
+            console.log(err.message)
         }
     };
 

@@ -13,20 +13,24 @@ const StudentProfile = () => {
    const [userProfile,setUserProfile]=useState<userProfilePayloadType | null>(null);
   const router = useRouter();
 
-  useEffect(()=>{
-    const fetchUserProfile=async()=>{
-      try {
-         const response:UserProfileApiResponse=await verifyAuth();
-         if (response?.status === "success" && response?.data) {
-          setUserProfile(response?.data);
-        }
-      } catch (error:any) {
-        console.log(error.message)
-        toast.error("Failed to load profile data");
+ useEffect(() => {
+  // 1️⃣ define it
+  const fetchUserProfile = async () => {
+    try {
+      const response: UserProfileApiResponse = await verifyAuth();
+      if (response?.status === "success" && response?.data) {
+        setUserProfile(response.data);
       }
-      fetchUserProfile();
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error("Failed to load profile data");
     }
-  },[])
+  };
+
+  // 2️⃣ call it (once) after definition
+  fetchUserProfile();
+}, []); // empty deps → run only on first render
+
   console.log("madi",userProfile)
 
   console.log("lets look at hthe phone ",userProfile?.phoneNumber)
@@ -49,7 +53,7 @@ const StudentProfile = () => {
           <Leftside userProfile={userProfile}/>
         </div>
         <div className='md:col-span-2'>
-          <PersonalInformation userProfile={userProfile} setUserProfile={setUserProfile}/>
+          <PersonalInformation  setUserProfile={setUserProfile}/>
         </div>
       </div>
     </div>

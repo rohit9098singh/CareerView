@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { jobType } from "../../../../../../types/job";
 import { jobDataPayloadType } from "../../../../../../types/fetchJobResponse";
 
 interface JobDeleteDialogProps {

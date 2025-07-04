@@ -16,7 +16,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Download, Eye, Users, View } from "lucide-react";
+import { Download, Eye, Users} from "lucide-react";
 import {
     Select,
     SelectContent,
@@ -26,14 +26,14 @@ import {
 } from "@/components/ui/select";
 import { useParams } from "next/navigation";
 import {
-  getAllAppliedJobs,
+  // getAllAppliedJobs,
     getApplicationsByJobId,
-    getRecommendedJobs,
+    // getRecommendedJobs,
     updateApplicationStatus,
 } from "@/components/services/job.service";
 import { Application } from "../../../../../../types/allApplicantsData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast";
 
 const ApplicantsTable: React.FC = () => {
     const [applicants, setApplicants] = useState<Application[]>([]);
@@ -49,8 +49,8 @@ const ApplicantsTable: React.FC = () => {
                 if (response?.status === "success") {
                     setApplicants(response.data);
                 }
-            } catch (error) {
-                console.log("Error fetching applicants");
+            } catch (error:any) {
+                console.log("Error fetching applicants",error);
             }
         };
         fetchApplicants();
@@ -63,7 +63,7 @@ const ApplicantsTable: React.FC = () => {
                 applicantId,
             });
             console.log("Status updated:", response?.status);
-        } catch (err) {
+        } catch (err:any) {
             console.error("Failed to update status:", err);
         }
     };

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Building, Filter, MapPin } from 'lucide-react'
+import { Building, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -16,7 +16,6 @@ import { AppliedJobType } from '../../../../../../types/applyJobTypes'
 import { getRecommendedJobs } from '@/components/services/job.service'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import ApplynowForm from '../../JobDetails/components/ApplynowForm'
 
 const RecommendedJobs = () => {
   const [selectedType, setSelectedType] = useState("all")

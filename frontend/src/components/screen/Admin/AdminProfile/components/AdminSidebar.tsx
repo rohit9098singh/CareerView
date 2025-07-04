@@ -1,11 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent} from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Briefcase, FileText, MapPin, Settings, ShieldCheck, Upload } from "lucide-react"
+import { Briefcase,  MapPin, Settings, ShieldCheck} from "lucide-react"
 import { useRouter } from "next/navigation"
-import { UserProfileApiResponse, userProfilePayloadType } from "../../../../../../types/updateProfileResponse"
+import {  userProfilePayloadType } from "../../../../../../types/updateProfileResponse"
 
 interface PersonalInformationProps {
   adminProfile: userProfilePayloadType | null;

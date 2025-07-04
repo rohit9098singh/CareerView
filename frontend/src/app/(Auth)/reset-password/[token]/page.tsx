@@ -3,7 +3,7 @@ import ResetPasswordHOC from '@/components/screen/Auth/ResetPassword/ResetPasswo
 import { useParams } from 'next/navigation'
 import React from 'react'
 
-const page = () => {
+const Page = () => {
   const params = useParams();
   const token = typeof params?.token === 'string' ? params.token : '';
   return (
@@ -13,4 +13,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

@@ -6,12 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, X, FileText } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { adminProfileValidation } from "./validation/adminProfileValidation";
-import { UserProfileApiResponse, userProfilePayloadType } from "../../../../../../types/updateProfileResponse";
+import { userProfilePayloadType } from "../../../../../../types/updateProfileResponse";
 import { editAdminProfile } from "@/components/services/job.service";
 import toast from "react-hot-toast";
 
@@ -19,12 +18,12 @@ type adminInfoType = z.infer<typeof adminProfileValidation>;
 
 interface PersonalInformationProps {
   adminProfile: userProfilePayloadType ;
-  setAdminProfile: React.Dispatch<React.SetStateAction<userProfilePayloadType | null >>;
+  // setAdminProfile: React.Dispatch<React.SetStateAction<userProfilePayloadType | null >>;
 }
 
-export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile, setAdminProfile }) => {
+export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
 
   const form = useForm({
@@ -56,7 +55,7 @@ export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile,
 
   const onSubmit = async (data: adminInfoType) => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const response: any = await editAdminProfile(data);
       if (response.status === "success") {
         toast.success("Profile updated successfully");
@@ -70,7 +69,7 @@ export const AdminDetails: React.FC<PersonalInformationProps> = ({ adminProfile,
     } catch (error: any) {
       toast.error(error.message || "Error while editing");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

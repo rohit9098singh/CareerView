@@ -35,7 +35,7 @@ const QuickAccess = () => {
             <h2 className="text-lg font-medium mb-3">Quick Access</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {
-                    quickAcessdata.map((data, index) => (
+                    quickAcessdata.map((data) => (
                         <Card
                             key={data.id}
                             onClick={() => { router.push(data.path) }}

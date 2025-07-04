@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Briefcase, FileText, MapPin, School, Upload } from 'lucide-react'
-import { UserProfileApiResponse, userProfilePayloadType } from '../../../../../../types/updateProfileResponse'
+import { Briefcase,  MapPin, School } from 'lucide-react'
+import {  userProfilePayloadType } from '../../../../../../types/updateProfileResponse'
 import { verifyAuth } from '@/components/services/auth.service'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
@@ -10,7 +10,7 @@ interface PersonalInformationProps {
   userProfile: userProfilePayloadType | null;
 }
 
-const Leftside: React.FC<PersonalInformationProps> = ({ userProfile }) => {
+const Leftside: React.FC<PersonalInformationProps> = () => {
 
   const [userInfo, setUserInfo] = useState<userProfilePayloadType | null>(null)
 

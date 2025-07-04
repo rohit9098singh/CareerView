@@ -19,19 +19,18 @@ import { personalInfoSchema } from "./validation/personalInfoSchema"
 import { z } from "zod"
 import { editProfile } from "@/components/services/job.service"
 import toast from "react-hot-toast"
-import { UserProfileApiResponse, userProfilePayloadType } from "../../../../../../types/updateProfileResponse"
+import { userProfilePayloadType } from "../../../../../../types/updateProfileResponse"
 import { verifyAuth } from "@/components/services/auth.service"
 
 type personalInfoInput = z.infer<typeof personalInfoSchema>
 
 interface PersonalInformationProps {
-  userProfile: userProfilePayloadType | null;
+  // userProfile: userProfilePayloadType | null;
   setUserProfile: React.Dispatch<React.SetStateAction<userProfilePayloadType | null>>;
 }
 
-const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, setUserProfile }) => {
+const PersonalInformation:React.FC<PersonalInformationProps> = ({ setUserProfile }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [loading, setLoading] = useState(false)
 
   const form = useForm({
     resolver: zodResolver(personalInfoSchema),
@@ -41,7 +40,7 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
       phoneNumber: "",
       location: "",
       bio: "",
-      skills: [""],
+      // skills: [""],
       studyingAt: "",
       resumeUrl: "",
       profilePicture: ""
@@ -69,8 +68,8 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
             profilePicture: data.profilePicture || ""
           });
         }
-      } catch (error) {
-        toast.error("Failed to load profile data");
+      } catch (error:any) {
+        toast.error("Failed to load profile data",error);
       }
     };
     fetchUserProfile();
@@ -80,7 +79,6 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
   const onSubmit = async (data: personalInfoInput) => {
     console.log(data.skills)
     try {
-      setLoading(true);
       const response: any = await editProfile(data);
       if (response.status === "success") {
         toast.success("profile updated successfuly");
@@ -94,9 +92,7 @@ const PersonalInformation:React.FC<PersonalInformationProps> = ({ userProfile, s
       }
     } catch (error: any) {
       toast.error(error.message || "Error while Editing")
-    } finally {
-      setLoading(false)
-    }
+    } 
   }
 
   const onCancel = () => {

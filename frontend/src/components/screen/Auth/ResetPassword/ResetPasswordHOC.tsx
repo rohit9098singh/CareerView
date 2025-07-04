@@ -1,5 +1,4 @@
 import dynamic from "next/dynamic"
-import react from "react"
 
 const ResetPassword=dynamic(()=>import("./ResetPassword"))
 

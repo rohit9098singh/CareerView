@@ -24,8 +24,8 @@ const RecentApplications = () => {
                 } else {
                     console.error("Unexpected response format:", response);
                 }
-            } catch (error) {
-                console.error("Something went wrong. Try again later.");
+            } catch (error:any) {
+                console.error("Something went wrong. Try again later.",error);
             }
         }
         fetchData();

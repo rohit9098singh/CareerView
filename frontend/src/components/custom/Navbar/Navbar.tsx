@@ -4,8 +4,8 @@ import {
   LogOut,
   Menu,
   Settings,
-  User,
-  User2,
+  // User,
+  // User2,
   X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
@@ -17,7 +17,7 @@ import { userProfilePayloadType } from "../../../../types/updateProfileResponse"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const Navbar = () => {
-  const user = "student"; // Replace with actual user type logic
+  // const user = "student"; // Replace with actual user type logic
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userData, setUserData] = useState<userProfilePayloadType | null>(null)
   const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false);
@@ -34,8 +34,8 @@ const Navbar = () => {
           const data = response?.data;
           setUserData(data);
         }
-      } catch (error) {
-        toast.error("Failed to load profile data");
+      } catch (error:any) {
+        toast.error("Failed to load profile data",error);
       }
     };
     fetchUserProfile();
@@ -49,8 +49,8 @@ const Navbar = () => {
       await logoutUser();
       toast.success("Logged out successfully");
       router.push("/login");
-    } catch (error) {
-      toast.error("Logout failed");
+    } catch (error:any) {
+      toast.error("Logout failed",error);
     }
   };
 

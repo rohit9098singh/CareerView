@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, ArrowDownAZ, RotateCcw } from 'lucide-react'
+import { Search, RotateCcw } from 'lucide-react'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 interface AppliedJobHeaderProps {

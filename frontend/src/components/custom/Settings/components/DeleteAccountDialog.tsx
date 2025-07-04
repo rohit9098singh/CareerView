@@ -35,8 +35,8 @@ export default function DeleteAccountDialog() {
             const data = response?.data;
             setUserData(data);
           }
-        } catch (error) {
-          toast.error("Failed to load profile data");
+        } catch (error:any) {
+          toast.error("Failed to load profile data",error);
         }
       };
       fetchUserProfile();
@@ -127,7 +127,7 @@ export default function DeleteAccountDialog() {
                     className={confirmText && confirmText !== accountName ? "border-destructive" : ""}
                   />
                   {confirmText && confirmText !== accountName && (
-                    <p className="text-xs text-destructive">Account name doesn't match</p>
+                    <p className="text-xs text-destructive">Account name doesn&apos;t match</p>
                   )}
                 </div>
               </div>

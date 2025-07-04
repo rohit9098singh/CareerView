@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Filter, RotateCcw, SearchIcon, SortAsc } from 'lucide-react'
+import {  RotateCcw, SearchIcon} from 'lucide-react'
 import {
   Select,
   SelectContent,

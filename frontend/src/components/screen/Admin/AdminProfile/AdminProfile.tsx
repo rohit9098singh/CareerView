@@ -37,7 +37,7 @@ export default function AdminProfile() {
       {adminProfile! && (
         <div className="grid gap-6 md:grid-cols-[1fr_2fr]">
           <AdminSidebar adminProfile={adminProfile} />
-          <AdminDetails adminProfile={adminProfile} setAdminProfile={setAdminProfile} />
+          <AdminDetails adminProfile={adminProfile}  />
         </div>
       )}
     </div>

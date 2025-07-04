@@ -9,7 +9,7 @@ const FaqSection=()=> {
         <AccordionItem value="item-1">
           <AccordionTrigger className="text-left font-medium cursor-pointer">How do I apply for a job?</AccordionTrigger>
           <AccordionContent>
-            Click the "Apply Now" button on any job listing. You'll be directed to the application form where you can
+            Click the Apply Now button on any job listing. You&quot;ll be directed to the application form where you can
             submit your resume and cover letter.
           </AccordionContent>
         </AccordionItem>
@@ -23,14 +23,14 @@ const FaqSection=()=> {
         <AccordionItem value="item-3">
           <AccordionTrigger className="text-left font-medium cursor-pointer">How can I track my applications?</AccordionTrigger>
           <AccordionContent>
-            All your applications are tracked in the "My Applications" section of your profile. You can see their status
+            All your applications are tracked in the My Applications section of your profile. You can see their status
             and any messages from employers.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-4">
           <AccordionTrigger className="text-left font-medium cursor-pointer">What makes a strong application?</AccordionTrigger>
           <AccordionContent>
-            A tailored resume highlighting relevant skills, a personalized cover letter addressing the company's needs,
+            A tailored resume highlighting relevant skills, a personalized cover letter addressing the company&quot;s needs,
             and complete profile information all contribute to a strong application.
           </AccordionContent>
         </AccordionItem>

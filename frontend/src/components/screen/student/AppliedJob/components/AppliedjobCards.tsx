@@ -1,7 +1,6 @@
 "use client"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Calendar, Building2, MapPin, Briefcase, DollarSign, ChevronRight } from "lucide-react"
+import { Calendar, MapPin, Briefcase, DollarSign, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -9,7 +8,6 @@ import Pagination from "@/components/custom/Pagination/Pagination"
 import { AppliedJobType } from "../../../../../../types/applyJobTypes"
 import { getJobStatusBadgeClass } from "@/components/custom/customcolor/CustomColor"
 import { formatDateInDDMMYYY } from "@/lib/utils"
-import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface Props {
