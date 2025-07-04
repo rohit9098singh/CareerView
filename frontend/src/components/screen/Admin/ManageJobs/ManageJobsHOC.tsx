@@ -1,7 +1,7 @@
 import Navbar from "@/components/custom/Navbar/Navbar";
 import dynamic from "next/dynamic";
 
-const ManageJobs = dynamic(() => import("./ManageJobs"), { ssr: false });
+const ManageJobs = dynamic(() => import("./ManageJobs",))
 
 export const ManageJobsHOC = () => {
     return (
