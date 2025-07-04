@@ -18,5 +18,5 @@ export const editFormSchema = z.object({
   applicationDeadLine: z.string().min(1, "Application deadline is required"),
   companyBenefits: z.string().min(1, "Company benefits are required"),
   aboutCompany: z.string().min(1, "About company is required"),
-  companyLogo: z.instanceof(File).nullable() ,
+  companyLogo:  z.any().nullable(),
 })
