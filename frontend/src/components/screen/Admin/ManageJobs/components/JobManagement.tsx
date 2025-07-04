@@ -68,7 +68,7 @@ export default function JobManagement() {
               <TableHead className="text-md font-bold py-3">Type</TableHead>
               <TableHead className="text-md font-bold py-3">Status</TableHead>
               <TableHead className="text-md font-bold py-3">Posted</TableHead>
-              <TableHead className="text-md font-bold py-3">Actions</TableHead>
+              <TableHead className="text-md font-bold py-3">actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
