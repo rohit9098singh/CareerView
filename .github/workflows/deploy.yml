@@ -61,7 +61,9 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y openssh-client
 
     - name: Add EC2 to known_hosts
-      run: ssh-keyscan ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
+      run: |
+    mkdir -p ~/.ssh
+    ssh-keyscan ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
 
     - name: Upload build archive to EC2
       env:
