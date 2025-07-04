@@ -17,5 +17,5 @@ export const postFormSchema = z.object({
   applicationDeadLine: z.string().min(1, "Application deadline is required"),
   companyBenefits: z.string().min(1, "Company benefits are required"),
   aboutCompany: z.string().min(1, "About company is required"),
-  logo: z.instanceof(File).nullable(),
+   logo: z.any().nullable(),
 })
