@@ -62,7 +62,7 @@ export default function JobManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-md py-3 font-bold">title</TableHead>
+              <TableHead className="text-md py-3 font-bold">Title</TableHead>
               <TableHead className="text-md font-bold py-3">Company</TableHead>
               <TableHead className="text-md font-bold py-3">Location</TableHead>
               <TableHead className="text-md font-bold py-3">Type</TableHead>
