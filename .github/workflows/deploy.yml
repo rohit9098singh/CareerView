@@ -64,7 +64,7 @@ jobs:
     - name: Add EC2 to known_hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
+        ssh-keyscan 13.60.201.226 >> ~/.ssh/known_hosts
 
     - name: Upload build archive to EC2
       env:
@@ -74,7 +74,7 @@ jobs:
         chmod 600 /tmp/ec2_key.pem
         rsync -avz --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" \
           nextjs-build.tar.gz \
-          ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:${{ env.REMOTE_DIR }}/
+          ${{ secrets.EC2_USER }}@13.60.201.226:${{ env.REMOTE_DIR }}/
 
     # 6️⃣  Deploy on the VM
     - name: Unpack & start app on EC2
@@ -86,7 +86,7 @@ jobs:
         chmod 600 /tmp/ec2_key.pem
 
         ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no ${{
-          secrets.EC2_USER }}@${{ secrets.EC2_IP }} << 'EOF'
+          secrets.EC2_USER }}@13.60.201.226 << 'EOF'
           set -e
 
           REMOTE_DIR=${REMOTE_DIR}
