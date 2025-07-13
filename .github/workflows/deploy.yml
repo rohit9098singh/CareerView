@@ -67,7 +67,33 @@ jobs:
 
     - name: Upload build archive to EC2
       env:
-        SSH_KEY: ${{ secrets.EC2_PASSWORD }}   # consider renaming this secret to EC2_SSH_KEY
+        SSH_KEY: -----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA8m6kWrYnnxFV3AP2CtT/spbSosEaG7pbj/KSbieQfr09ny0Y
+IAszcLvKS8D8AuKvWMQu4TvfFy8BmOrYWMUX+uQqQHAJ45FsxOqGRvgGnKvNom0K
+kBDfWDLYqrUli/dnqPFRkeGaYfxWXFbwW9f+QBDzKRABKwuHbvsyhCwNqGvN4luZ
+gGxnkVtWrTdi5l5yJTalzvAbKLlhZoChCc8k0blpBYypEgpaQf4OfV7dCo2Wrnnq
+K4RFZckqCfsBqirUseDxq84jdmNmucBM+wg22i1mYY7Z+9eDcR2wZQ2gJjIXEf8O
+C6z5Er3EggA8TzFVRDAkx1sl70y1ALYxjqEU7QIDAQABAoIBABynWyGlmfVBFUbV
+6QTKvBYdoXO/IxjX4+6Vmx0N7BQuxdPEfq9642+Voollm+Oza0owleHlM68HzUaH
+q16CnRz4Ts4i7+hHzfVQSuKkehOWcs2Z2b/BXsSL7fPvSSrL6SKcsyls4tRmAMcV
+N3+DffeQiUz3KUwvJqjFY+kfU9Xt/RmR8cuy6THggReoTpxE1Ir+yUcrYxpJtp/r
+JcsUq3VQOgN5+nJUpV6sl8E2xLq8DrG0qSjktu0RtNM2iRbrn77uHmOC10AZBZMK
+IEEMxQC26+GgdJDJVbvIq7ux3r+EYAo9vDSEs8okwCfa0nQjNjew6hACkDbgtaTr
+pqbqUYECgYEA+k05rJcR3SycDTpGk1mJTy2vAoungAPDfFjUHdN3GtWwfW1R9q93
+SWbN5yzgk69uHvLV18wYbuQVgDvcOucqZNZUR8GLJ9vEWTLbxkkpoGl5cEtB7q7b
+IjT19S7dZoE8TIuJP/vpOYMrjaf7rrkVCjUCFNm0l2y+79udDwnujVECgYEA9/ON
+jhJgqIIryfB7WDkapUDKDs6IDT3JYVS8yEceHmjX9qSXCgWJn6bW1xO7OzouBz2t
+oKG46jYQZzakrqdZUU0+W/89iZ5yLsXDK3CYp0/8lX+3drpQ+Aj7Q0vyrDarpKFe
+p9kjHlF8lxI8Q5cc8UR77z67on1/8C/2LstCNt0CgYEA17MHOalyVpSj4m5O9Zpa
+TuaChAIPla0ooJb4LL/YS0LNdjloQdrSRGoYlNjCq+KpVnhUOkSC5cUelkR/tC8U
+BJQDS1cJ8Y5c9bVzWbwg6EEcyt2/8s2ywBa9ws3hM/25FgnFfGM9iDd2p/uUU+zh
+qcsmgQtfqoKnRJKQFa6sahECgYBvK7wkHwlHhFWtzS0AeVoBDfOKf/9wMGvCQAQE
+qB5Q9CEgbNtrmuABvQRGmoowG/3XMUhP5TLLkEH6hP2BcXcShNeY1+/3bBs17WV8
+bJeFLM/LF+BiU1dKXnyJx9uea0S6I8AU8b5VMaPy+DIc+/v2EQagVjg6uppKTrbK
+dEfT4QKBgQDPvdcOfj2NW0sjM3DDVtW5iZF1wA1GAvmC//Cfff9HB+CHTwltURWV
+lUctFdRfqDYMY6XI9LJal/VyegF3cHii7lpHDMgtt6qpuhyJ/9C/MgUKviHEoz/V
+q7rrZmMd8LpudDaoiXcpGJJFgg+b6rqjmIvXe5pOTAv002WUw7K5Jw==
+-----END RSA PRIVATE KEY-----   # consider renaming this secret to EC2_SSH_KEY
       run: |
         echo "$SSH_KEY" | tr -d '\r' > /tmp/ec2_key.pem
         chmod 600 /tmp/ec2_key.pem
@@ -78,7 +104,33 @@ jobs:
     # 6️⃣  Deploy on the VM
     - name: Unpack & start app on EC2
       env:
-        SSH_KEY: ${{ secrets.EC2_PASSWORD }}
+        SSH_KEY: -----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA8m6kWrYnnxFV3AP2CtT/spbSosEaG7pbj/KSbieQfr09ny0Y
+IAszcLvKS8D8AuKvWMQu4TvfFy8BmOrYWMUX+uQqQHAJ45FsxOqGRvgGnKvNom0K
+kBDfWDLYqrUli/dnqPFRkeGaYfxWXFbwW9f+QBDzKRABKwuHbvsyhCwNqGvN4luZ
+gGxnkVtWrTdi5l5yJTalzvAbKLlhZoChCc8k0blpBYypEgpaQf4OfV7dCo2Wrnnq
+K4RFZckqCfsBqirUseDxq84jdmNmucBM+wg22i1mYY7Z+9eDcR2wZQ2gJjIXEf8O
+C6z5Er3EggA8TzFVRDAkx1sl70y1ALYxjqEU7QIDAQABAoIBABynWyGlmfVBFUbV
+6QTKvBYdoXO/IxjX4+6Vmx0N7BQuxdPEfq9642+Voollm+Oza0owleHlM68HzUaH
+q16CnRz4Ts4i7+hHzfVQSuKkehOWcs2Z2b/BXsSL7fPvSSrL6SKcsyls4tRmAMcV
+N3+DffeQiUz3KUwvJqjFY+kfU9Xt/RmR8cuy6THggReoTpxE1Ir+yUcrYxpJtp/r
+JcsUq3VQOgN5+nJUpV6sl8E2xLq8DrG0qSjktu0RtNM2iRbrn77uHmOC10AZBZMK
+IEEMxQC26+GgdJDJVbvIq7ux3r+EYAo9vDSEs8okwCfa0nQjNjew6hACkDbgtaTr
+pqbqUYECgYEA+k05rJcR3SycDTpGk1mJTy2vAoungAPDfFjUHdN3GtWwfW1R9q93
+SWbN5yzgk69uHvLV18wYbuQVgDvcOucqZNZUR8GLJ9vEWTLbxkkpoGl5cEtB7q7b
+IjT19S7dZoE8TIuJP/vpOYMrjaf7rrkVCjUCFNm0l2y+79udDwnujVECgYEA9/ON
+jhJgqIIryfB7WDkapUDKDs6IDT3JYVS8yEceHmjX9qSXCgWJn6bW1xO7OzouBz2t
+oKG46jYQZzakrqdZUU0+W/89iZ5yLsXDK3CYp0/8lX+3drpQ+Aj7Q0vyrDarpKFe
+p9kjHlF8lxI8Q5cc8UR77z67on1/8C/2LstCNt0CgYEA17MHOalyVpSj4m5O9Zpa
+TuaChAIPla0ooJb4LL/YS0LNdjloQdrSRGoYlNjCq+KpVnhUOkSC5cUelkR/tC8U
+BJQDS1cJ8Y5c9bVzWbwg6EEcyt2/8s2ywBa9ws3hM/25FgnFfGM9iDd2p/uUU+zh
+qcsmgQtfqoKnRJKQFa6sahECgYBvK7wkHwlHhFWtzS0AeVoBDfOKf/9wMGvCQAQE
+qB5Q9CEgbNtrmuABvQRGmoowG/3XMUhP5TLLkEH6hP2BcXcShNeY1+/3bBs17WV8
+bJeFLM/LF+BiU1dKXnyJx9uea0S6I8AU8b5VMaPy+DIc+/v2EQagVjg6uppKTrbK
+dEfT4QKBgQDPvdcOfj2NW0sjM3DDVtW5iZF1wA1GAvmC//Cfff9HB+CHTwltURWV
+lUctFdRfqDYMY6XI9LJal/VyegF3cHii7lpHDMgtt6qpuhyJ/9C/MgUKviHEoz/V
+q7rrZmMd8LpudDaoiXcpGJJFgg+b6rqjmIvXe5pOTAv002WUw7K5Jw==
+-----END RSA PRIVATE KEY-----
         NEXT_PUBLIC_BACKEND_URL: ${{ vars.NEXT_PUBLIC_BACKEND_URL }}
       run: |
         echo "$SSH_KEY" | tr -d '\r' > /tmp/ec2_key.pem
