@@ -3,7 +3,7 @@ name: Deploy Next.js to EC2 with Nginx
 on:
   push:
     branches: [main]
-#ec2 value added 
+
 
 jobs:
   deploy:
