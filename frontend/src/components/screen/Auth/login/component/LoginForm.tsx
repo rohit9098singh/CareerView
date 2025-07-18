@@ -42,7 +42,7 @@ const LoginForm = () => {
             const role = response?.data?.role;
 
             if (role === "user") {
-                toast.success("User logged in successfully");
+                toast.success("User logged in successfully!");
                 router.push("/student/Home");
             } else if (role === "admin") {
                 toast.success("Admin logged in successfully");
