@@ -40,7 +40,6 @@ const LoginForm = () => {
             setLoading(true);
             const response = await loginUser(data);
             const role = response?.data?.role;
-            console.log("here is the role",role)
 
             if (role === "user") {
                 toast.success("User logged in successfully");
