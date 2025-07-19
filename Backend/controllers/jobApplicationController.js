@@ -93,39 +93,36 @@ export const applyJob = async (req, res) => {
   
 
   export const changeApplicationStatus = async (req, res) => {
-    
-    const {  jobId } = req.params;
-    const { status,applicantId } = req.body;
-  
-    if (!["pending", "accepted", "rejected", "interview-schedule"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value" });
+  const { jobId } = req.params;
+  const { status, applicantId } = req.body;
+
+  const validStatuses = ["pending", "accepted", "rejected", "interview-schedule"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: "Invalid status provided" });
+  }
+
+  try {
+    const application = await JobApplication.findOne({ applicantId, jobId });
+
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
     }
-    try {
-      const application = await JobApplication.findOne({ applicantId, jobId });
-  
-      if (!application) {
-        return res.status(404).json({ message: "Application not found" });
-      }
-  
-      application.status = status;
-      await application.save();
-  
-      await User.updateOne(
-        {
-          _id: applicantId,
-          "appliedJobs.jobId": jobId
-        },
-        {
-          $set: { "appliedJobs.$.status": status }
-        }
-      );
-  
-      res.status(200).json({ message: "Application status updated", application });
-  
-    } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
-    }
-  };
+
+    // Update status in JobApplication collection
+    application.status = status;
+    await application.save();
+
+    // Update status in User's appliedJobs array
+    await User.updateOne(
+      { _id: applicantId, "appliedJobs.jobId": jobId },
+      { $set: { "appliedJobs.$.status": status } }
+    );
+
+    res.status(200).json({ message: "Application status updated", application });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
   
   // API to edit the user's profile
   export const editProfile = async (req, res) => {
@@ -280,4 +277,17 @@ export const applyJob = async (req, res) => {
       return response(res, 500, "Internal server error", error.message);
     }
   };
+
+  export const getAllApplications=async (req,res)=>{
+     try {
+         const applications=await JobApplication.find()
+         .populate("applicantId","name email")
+         .populate("jobId","jobTitle  companyName")
+         .sort({createdAt: -1})
+
+         return response(res,200,"Application fetched Successfully",applications)
+     } catch (error) {
+        return response(res,500,error.message)
+     }
+  }
   

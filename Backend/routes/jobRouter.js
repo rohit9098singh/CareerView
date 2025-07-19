@@ -14,7 +14,7 @@ import {
 } from "../controllers/jobControllers.js";
 import authenticateUser from "../middleware/authMiddleware.js";
 import { multerMiddleware } from "../config/cloudinary.js";
-import { changeApplicationStatus, applyJob, getApplicationOfJobByJobId, editProfile, getTopPerformingJobs, editAdminProfile } from "../controllers/jobApplicationController.js";
+import { changeApplicationStatus, applyJob, getApplicationOfJobByJobId, editProfile, getTopPerformingJobs, editAdminProfile, getAllApplications } from "../controllers/jobApplicationController.js";
 
 const router = express.Router();
 
@@ -41,7 +41,6 @@ router.post("/edit-profile",authenticateUser,multerMiddleware.fields([
 router.post("/edit-admin-profile",authenticateUser,multerMiddleware.fields([{name:"profilePicture",maxCount:1}]),editAdminProfile)
 router.get("/get-top-performing-jobs",getTopPerformingJobs)
 
-
-
+router.get('/applications', authenticateUser, getAllApplications);
 
 export default router;
