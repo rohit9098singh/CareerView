@@ -270,3 +270,13 @@ export const getTopPerformingJobs=async()=>{
       console.log(error)
   }
 }
+
+
+export const getAllApplications=async ()=>{
+  try {
+      const response=await axiosInstance.get("api/v1/applications")
+      return response?.data
+  } catch (error) {
+     console.log(error)
+  }
+}
