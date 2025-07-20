@@ -5,9 +5,9 @@ import response from "../utils/responseHandler.js";
 const authenticateUser = async (req, res, next) => {
   const token = req.cookies["access_token"];
   if (!token) {
-    return response(res, 401, "User not Authenticated, no token available");
+    return response(res, 401, "User not Authenticated, no token available here");
   }
-
+   
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
