@@ -22,16 +22,16 @@ jobs:
 
       # Install dependencies
       - name: Install Dependencies
-        run: cd backend && npm install
+        run: cd Backend && npm install
 
       # Build the API (for TypeScript compilation) - Skip if no build needed
       - name: Build API
-        run: cd backend && npm run build || echo "No build script found, skipping build"
+        run: cd Backend && npm run build || echo "No build script found, skipping build"
 
       # Archive build files
       - name: Archive Build Artifacts
         run: |
-          cd backend
+          cd Backend
           tar -czf ../nodejs-api-build.tar.gz --exclude=node_modules --exclude=.git .
 
       # Install SSH Client for uploading build artifacts to EC2
@@ -58,12 +58,12 @@ jobs:
         run: |
           ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $SCP_USER@$SCP_IP << 'EOF'
             # Navigate to the deployment directory
-            sudo mkdir -p /home/ubuntu/careerView-backend
-            sudo chown -R $USER:$USER /home/ubuntu/careerView-backend
-            cd /home/ubuntu/careerView-backend
+            sudo mkdir -p /home/ubuntu/careerView-Backend
+            sudo chown -R $USER:$USER /home/ubuntu/careerView-Backend
+            cd /home/ubuntu/careerView-Backend
             
             # Extract the build artifacts
-            tar -xzf /tmp/nodejs-api-build.tar.gz -C /home/ubuntu/careerView-backend
+            tar -xzf /tmp/nodejs-api-build.tar.gz -C /home/ubuntu/careerView-Backend
             
             # Update system packages
             sudo apt-get update
@@ -86,18 +86,18 @@ jobs:
             npm install --force
 
             # Create the .env file with the specified environment variables
-            echo "EMAIL_ID=${{ secrets.EMAIL_ID }}" > /home/ubuntu/careerView-backend/.env
-            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /home/ubuntu/careerView-backend/.env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> /home/ubuntu/careerView-backend/.env
-            echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> /home/ubuntu/careerView-backend/.env
-            echo "PORT=${{ vars.BACKEND_PORT || '8080' }}" >> /home/ubuntu/careerView-backend/.env
-            echo "FRONTEND_URL=${{ vars.FRONTEND_URL }}" >> /home/ubuntu/careerView-backend/.env
-            echo "NODE_ENV=production" >> /home/ubuntu/careerView-backend/.env
-            echo "CLOUDANARY_CLOUD_NAME=${{ secrets.CLOUDANARY_CLOUD_NAME }}" >> /home/ubuntu/careerView-backend/.env
-            echo "CLOUDANARY_APIKEY=${{ secrets.CLOUDANARY_APIKEY }}" >> /home/ubuntu/careerView-backend/.env
-            echo "CLOUDANARY_SECRETS=${{ secrets.CLOUDANARY_SECRETS }}" >> /home/ubuntu/careerView-backend/.env
-            echo "GOOGLE_APIKEY=${{ secrets.GOOGLE_APIKEY }}" >> /home/ubuntu/careerView-backend/.env
-            echo "GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }}" >> /home/ubuntu/careerView-backend/.env
+            echo "EMAIL_ID=${{ secrets.EMAIL_ID }}" > /home/ubuntu/careerView-Backend/.env
+            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "PORT=${{ vars.Backend_PORT || '8080' }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "FRONTEND_URL=${{ vars.FRONTEND_URL }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "NODE_ENV=production" >> /home/ubuntu/careerView-Backend/.env
+            echo "CLOUDANARY_CLOUD_NAME=${{ secrets.CLOUDANARY_CLOUD_NAME }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "CLOUDANARY_APIKEY=${{ secrets.CLOUDANARY_APIKEY }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "CLOUDANARY_SECRETS=${{ secrets.CLOUDANARY_SECRETS }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "GOOGLE_APIKEY=${{ secrets.GOOGLE_APIKEY }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }}" >> /home/ubuntu/careerView-Backend/.env
 
             # Install PM2 globally if not already installed
             if ! command -v pm2 &> /dev/null; then
@@ -106,8 +106,8 @@ jobs:
             fi
 
             # Stop and delete the previous application instance (if it exists)
-            pm2 stop careerView-backend 2>/dev/null || echo "No existing backend process to stop"
-            pm2 delete careerView-backend 2>/dev/null || echo "No existing backend process to delete"
+            pm2 stop careerView-Backend 2>/dev/null || echo "No existing Backend process to stop"
+            pm2 delete careerView-Backend 2>/dev/null || echo "No existing Backend process to delete"
             
             # Kill any process running on port 8080
             sudo fuser -k 8080/tcp 2>/dev/null || echo "No process running on port 8080"
@@ -117,10 +117,10 @@ jobs:
             
             # Debug: Check if .env file was created correctly
             echo "Checking .env file contents:"
-            cat /home/ubuntu/careerView-backend/.env
+            cat /home/ubuntu/careerView-Backend/.env
 
             # Start the Node.js Express API using PM2
-            pm2 start server.js --name "careerView-backend"
+            pm2 start server.js --name "careerView-Backend"
             
             # Save PM2 process list to be restored on reboot
             pm2 save
