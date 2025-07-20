@@ -1,0 +1,156 @@
+name: Deploy Next.js to EC2 with Nginx
+
+on:
+  push:
+    branches:
+      - main # Trigger the workflow on push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3 # Checkout the repository code
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3 # Set up Node.js environment
+        with:
+          node-version: "18" # Specify Node.js version 18
+
+      - name: Cache Node.js Modules
+        uses: actions/cache@v3 # Cache node_modules to speed up subsequent runs
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }} # Cache key based on OS and package-lock.json
+          restore-keys: |
+            ${{ runner.os }}-node- # Restore key for previous caches
+
+      - name: Install Dependencies
+        run: cd frontend && npm install --force # Install project dependencies
+
+      - name: Cache Next.js Build Cache
+        uses: actions/cache@v3 # Cache Next.js build artifacts
+        with:
+          path: frontend/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('frontend/package-lock.json') }} # Cache key based on OS and package-lock.json
+          restore-keys: |
+            ${{ runner.os }}-nextjs- # Restore key for previous caches
+
+      - name: Create .env File for Build
+        run: |
+          cd frontend
+          printf "NEXT_PUBLIC_NODE_ENV=%s\n" "production" >> .env
+          printf "NEXT_PUBLIC_API_URL=%s\n" "${{ vars.NEXT_PUBLIC_API_URL }}" >> .env
+
+      - name: Build Next.js Application
+        run: cd frontend && npm run build # Build the Next.js application
+
+      - name: Install SSH Client
+        run: sudo apt-get update && sudo apt-get install -y openssh-client # Install SSH client
+
+      - name: Ensure SSH Directory Exists
+        run: mkdir -p ~/.ssh # Create .ssh directory if it doesn't exist
+
+      - name: Add EC2 to Known Hosts
+        # Add the EC2 instance's host key to known_hosts to prevent SSH warnings
+        run: ssh-keyscan ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
+
+      - name: Upload Artifacts to EC2 using rsync
+        env:
+          SCP_USER: ${{ secrets.EC2_USER }}
+          SCP_IP: ${{ secrets.EC2_IP }}
+          # Use a more descriptive name for the private key secret
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PASSWORD }}
+        run: |
+          # Create a temporary file for the SSH private key
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem # Set correct permissions for the private key
+
+          # Create the application directory on EC2 and set ownership
+          ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $SCP_USER@$SCP_IP "sudo mkdir -p /home/ubuntu/careerView-frontend && sudo chown -R $SCP_USER:$SCP_USER /home/ubuntu/careerView-frontend"
+
+          # Sync the .next build output to the EC2 instance
+          rsync -avz --progress --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" frontend/.next/ $SCP_USER@$SCP_IP:/home/ubuntu/careerView-frontend/.next/
+          # Sync package.json to the EC2 instance
+          rsync -avz --progress --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" frontend/package.json $SCP_USER@$SCP_IP:/home/ubuntu/careerView-frontend/
+          # Sync package-lock.json to the EC2 instance (important for npm install --production)
+          rsync -avz --progress --delete -e "ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no" frontend/package-lock.json $SCP_USER@$SCP_IP:/home/ubuntu/careerView-frontend/
+
+      - name: Deploy to EC2
+        env:
+          SCP_USER: ${{ secrets.EC2_USER }}
+          SCP_IP: ${{ secrets.EC2_IP }}
+          # Use a more descriptive name for the private key secret
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PASSWORD }}
+          # Pass environment variables needed for the Next.js application on EC2
+          AUTH_TRUST_HOST: https://careerView.tech
+          NEXT_PUBLIC_NODE_ENV: production
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+        run: |
+          # Create a temporary file for the SSH private key
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem # Set correct permissions for the private key
+
+          # Execute commands on the EC2 instance
+          ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $SCP_USER@$SCP_IP << 'EOF'
+            cd /home/ubuntu/careerView-frontend
+            
+            # Update system packages
+            sudo apt-get update
+            
+            # Install Node.js and npm if not already installed
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+            
+            # Install nginx if not already installed
+            if ! command -v nginx &> /dev/null; then
+              sudo apt-get install -y nginx
+              sudo systemctl enable nginx
+              sudo systemctl start nginx
+            fi
+            
+            # Ensure npm install only production dependencies
+            npm install --force
+            
+            # Install PM2 globally if not already installed
+            if ! command -v pm2 &> /dev/null; then
+              echo "PM2 not found, installing globally..."
+              sudo npm install -g pm2
+            fi
+            
+            # Create the .env file with the specified environment variables for the application
+            # Using cat <<EOT for multi-line string with variable expansion
+            sudo bash -c 'cat <<EOT > /home/ubuntu/careerView-frontend/.env
+            AUTH_TRUST_HOST=https://careerView.tech
+            NEXT_PUBLIC_NODE_ENV=production
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            API_URL=${{ vars.NEXT_PUBLIC_API_URL }}api/v1
+            EOT'
+            
+            # Stop and delete the previous application instance (if it exists)
+            pm2 stop careerView-frontend 2>/dev/null || echo "No existing process to stop"
+            pm2 delete careerView-frontend 2>/dev/null || echo "No existing process to delete"
+            
+            # Start the Next.js application on port 3000 with PM2
+            # The '--' separates npm arguments from run script arguments
+            pm2 start npm --name "careerView-frontend" -- run start -- -p 3000
+            
+            # Save PM2 process list to be restored on reboot
+            pm2 save
+            
+            # Generate and enable PM2 startup script for systemd (only if not already set up)
+            if ! sudo systemctl is-enabled pm2-ubuntu &> /dev/null; then
+              sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+              sudo systemctl daemon-reload
+              sudo systemctl enable pm2-ubuntu
+            fi
+            
+            # Start the PM2 service
+            sudo systemctl start pm2-ubuntu || true
+            
+            # Restart Nginx to apply any proxy configuration changes
+            sudo systemctl restart nginx
+          EOF

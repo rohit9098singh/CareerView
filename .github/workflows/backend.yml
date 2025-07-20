@@ -1,0 +1,140 @@
+name: Deploy Node.js Express API to EC2 with Nginx
+
+on:
+  push:
+    branches:
+      - main # Trigger deployment on push to the develop branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the latest code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Specify the Node.js version
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: cd backend && npm install
+
+      # Build the API (for TypeScript compilation) - Skip if no build needed
+      - name: Build API
+        run: cd backend && npm run build || echo "No build script found, skipping build"
+
+      # Archive build files
+      - name: Archive Build Artifacts
+        run: |
+          cd backend
+          tar -czf ../nodejs-api-build.tar.gz --exclude=node_modules --exclude=.git .
+
+      # Install SSH Client for uploading build artifacts to EC2
+      - name: Install SSH Client
+        run: sudo apt-get install -y openssh-client
+
+      # Upload the build artifacts to the EC2 instance
+      - name: Upload Artifacts to EC2
+        env:
+          SCP_USER: ${{ secrets.EC2_USER }}
+          SCP_IP: ${{ secrets.EC2_IP }}
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PASSWORD }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > /tmp/ec2_key.pem
+          chmod 600 /tmp/ec2_key.pem
+          scp -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no nodejs-api-build.tar.gz $SCP_USER@$SCP_IP:/tmp/
+
+      # Deploy the Node.js Express API on the EC2 instance
+      - name: Deploy to EC2
+        env:
+          SCP_USER: ${{ secrets.EC2_USER }}
+          SCP_IP: ${{ secrets.EC2_IP }}
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PASSWORD }}
+        run: |
+          ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $SCP_USER@$SCP_IP << 'EOF'
+            # Navigate to the deployment directory
+            sudo mkdir -p /home/ubuntu/careerView-backend
+            sudo chown -R $USER:$USER /home/ubuntu/careerView-backend
+            cd /home/ubuntu/careerView-backend
+            
+            # Extract the build artifacts
+            tar -xzf /tmp/nodejs-api-build.tar.gz -C /home/ubuntu/careerView-backend
+            
+            # Update system packages
+            sudo apt-get update
+            
+            # Install Node.js and npm if not already installed
+            if ! command -v node &> /dev/null; then
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt-get install -y nodejs
+            fi
+            
+            # Install nginx if not already installed
+            if ! command -v nginx &> /dev/null; then
+              sudo apt-get install -y nginx
+              sudo systemctl enable nginx
+              sudo systemctl start nginx
+            fi
+
+
+            # Install production dependencies on the server
+            npm install --force
+
+            # Create the .env file with the specified environment variables
+            echo "EMAIL_ID=${{ secrets.EMAIL_ID }}" > /home/ubuntu/careerView-backend/.env
+            echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /home/ubuntu/careerView-backend/.env
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> /home/ubuntu/careerView-backend/.env
+            echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> /home/ubuntu/careerView-backend/.env
+            echo "PORT=${{ vars.BACKEND_PORT || '8080' }}" >> /home/ubuntu/careerView-backend/.env
+            echo "FRONTEND_URL=${{ vars.FRONTEND_URL }}" >> /home/ubuntu/careerView-backend/.env
+            echo "NODE_ENV=production" >> /home/ubuntu/careerView-backend/.env
+            echo "CLOUDANARY_CLOUD_NAME=${{ secrets.CLOUDANARY_CLOUD_NAME }}" >> /home/ubuntu/careerView-backend/.env
+            echo "CLOUDANARY_APIKEY=${{ secrets.CLOUDANARY_APIKEY }}" >> /home/ubuntu/careerView-backend/.env
+            echo "CLOUDANARY_SECRETS=${{ secrets.CLOUDANARY_SECRETS }}" >> /home/ubuntu/careerView-backend/.env
+            echo "GOOGLE_APIKEY=${{ secrets.GOOGLE_APIKEY }}" >> /home/ubuntu/careerView-backend/.env
+            echo "GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }}" >> /home/ubuntu/careerView-backend/.env
+
+            # Install PM2 globally if not already installed
+            if ! command -v pm2 &> /dev/null; then
+              echo "PM2 not found, installing globally..."
+              sudo npm install -g pm2
+            fi
+
+            # Stop and delete the previous application instance (if it exists)
+            pm2 stop careerView-backend 2>/dev/null || echo "No existing backend process to stop"
+            pm2 delete careerView-backend 2>/dev/null || echo "No existing backend process to delete"
+            
+            # Kill any process running on port 8080
+            sudo fuser -k 8080/tcp 2>/dev/null || echo "No process running on port 8080"
+            
+            # Wait a moment for the port to be freed
+            sleep 2
+            
+            # Debug: Check if .env file was created correctly
+            echo "Checking .env file contents:"
+            cat /home/ubuntu/careerView-backend/.env
+
+            # Start the Node.js Express API using PM2
+            pm2 start server.js --name "careerView-backend"
+            
+            # Save PM2 process list to be restored on reboot
+            pm2 save
+            
+            # Generate and enable PM2 startup script for systemd (only if not already set up)
+            if ! sudo systemctl is-enabled pm2-ubuntu &> /dev/null; then
+              sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+              sudo systemctl daemon-reload
+              sudo systemctl enable pm2-ubuntu
+            fi
+            
+            # Start the PM2 service
+            sudo systemctl start pm2-ubuntu || true
+
+            # Restart Nginx to apply reverse proxy changes
+            sudo systemctl restart nginx
+          EOF

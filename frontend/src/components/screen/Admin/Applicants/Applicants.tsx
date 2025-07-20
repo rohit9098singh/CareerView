@@ -151,7 +151,7 @@ const Applicants = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2 items-center flex-wrap">
+                    <div className="flex gap-2 items-center ">
                       <Button
                         variant="outline"
                         size="sm"
