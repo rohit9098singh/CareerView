@@ -120,7 +120,7 @@ jobs:
             cat /home/ubuntu/careerView-Backend/.env
 
             # Start the Node.js Express API using PM2
-            pm2 start server.js --name "careerView-Backend"
+            pm2 start index.js --name "careerView-Backend"
             
             # Save PM2 process list to be restored on reboot
             pm2 save
