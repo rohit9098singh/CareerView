@@ -2,7 +2,7 @@ import axiosInstance from "./url.service";
 
 export const registerUser = async (userData) => {
   try {
-    const response = await axiosInstance.post("/api/v1/register", userData);
+    const response = await axiosInstance.post("register", userData);
     return response.data;
   } catch (error) {
     console.error(
@@ -15,7 +15,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (userData) => {
   try {
-    const response = await axiosInstance.post("/api/v1/login", userData);
+    const response = await axiosInstance.post("/login", userData);
     if (response.data?.data?.token) {
       // Store in localStorage for client-side use
       localStorage.setItem('token', response.data.data.token);

@@ -7,8 +7,8 @@ import authenticateUser from "../middleware/authMiddleware.js";
 
 const router=express.Router();
 
-router.post("/register",register)
-router.post("/login",login)
+router.post("register",register)
+router.post("login",login)
 router.post("/logout",logout)
 // router.post("/verify-email/:token", verifyEmail);
 router.post("/forgot-password", forgotPassword);
