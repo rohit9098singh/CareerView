@@ -15,16 +15,15 @@ const uploadFileToCloudinary = (file) => {
         const options = {
             resource_type: file.mimetype.startsWith("video") ?  "video" : "image"
         };
-
-        cloudinary.uploader.upload_large(file.path, options, (error, result) => {
+        cloudinary.uploader.upload_stream(options, (error, result) => {
             if (error) {
                 return reject(error);
             }
             resolve(result);
-        });
+        }).end(file.buffer);
     });
 };
 
-const multerMiddleware = multer({ dest: "uploads/" });
+const multerMiddleware = multer({ storage: multer.memoryStorage() });
 
 export { multerMiddleware, uploadFileToCloudinary };
