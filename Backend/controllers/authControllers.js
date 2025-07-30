@@ -111,18 +111,16 @@ export const login = async (req, res) => {
       throw new Error("JWT_SECRET is not defined");
     }
 
-    const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
-    res.cookie("access_token", accessToken, {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      maxAge: 24 * 60 * 60 * 1000,
+    return response(res, 200, "Login successful", {
+      token,
+      role: user.role,
+      name: user.name,
+      email: user.email
     });
-
-    return response(res, 200, "Login successful", { accessToken, role: user.role });
   } catch (error) {
     return response(res, 500, "Internal Server Error", error.message);
   }
@@ -130,15 +128,8 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    if (!req.cookies["access_token"]) {
-      return response(res, 400, "No active session found");
-    }
-    res.clearCookie("access_token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-
+    // Since we're using localStorage on the frontend, we don't need to do anything here
+    // The frontend will handle clearing the token
     return response(res, 200, "Logged out successfully");
   } catch (error) {
     return response(res, 500, "Internal Server Error", error.message);
