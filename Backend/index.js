@@ -12,8 +12,18 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "https://career-view-64v6.vercel.app",
+  "http://localhost:3000"
+];
 const corsOption = {
-  origin: process.env.FRONTEND_URL,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 
