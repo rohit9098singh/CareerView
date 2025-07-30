@@ -14,10 +14,9 @@ const app = express();
 
 const corsOption = {
   origin: process.env.FRONTEND_URL,
-  credentials: true,
 };
 
-app.use(cors(corsOption));
+app.options("*", cors(corsOption));
 app.use(express.json());
 app.use(cookieParser());
 
