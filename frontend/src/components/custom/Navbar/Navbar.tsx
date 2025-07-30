@@ -34,23 +34,23 @@ const Navbar = () => {
           const data = response?.data;
           setUserData(data);
         }
-      } catch (error:any) {
-        toast.error("Failed to load profile data",error);
+      } catch (error: any) {
+        toast.error("Failed to load profile data", error);
       }
     };
     fetchUserProfile();
   }, []);
 
   const userPlaceholder = userData?.name?.toUpperCase().split(" ").map((name) => name[0]).join("");
-  
+
 
   const handleLogout = async () => {
     try {
       await logoutUser();
       toast.success("Logged out successfully");
       router.push("/login");
-    } catch (error:any) {
-      toast.error("Logout failed",error);
+    } catch (error: any) {
+      toast.error("Logout failed", error);
     }
   };
 
@@ -188,7 +188,7 @@ const Navbar = () => {
             <p
               onClick={() =>
                 router.push(
-                  userData?.role=== "user" ? "/student/settings" : "/admin/settings"
+                  userData?.role === "user" ? "/student/settings" : "/admin/settings"
                 )
               }
               className="flex items-center hover:text-purple-300 hover:bg-gray-100 cursor-pointer border-b mb-2 px-2 py-1 rounded"
@@ -226,10 +226,34 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
             className="absolute top-full left-4 right-4 mt-2 rounded-lg px-4 py-8 bg-white shadow-md space-y-2"
           >
-            <p className="hover:text-purple-300 cursor-pointer font-semibold">Dashboard</p>
-            <p className="hover:text-purple-300 cursor-pointer font-semibold">Find Jobs</p>
-            <p className="hover:text-purple-300 cursor-pointer font-semibold">Applied Jobs</p>
-            <p className="hover:text-purple-300 cursor-pointer font-semibold">Profile</p>
+            <p
+              onClick={() => router.push(userData?.role === "user" ? "/student/Home" : "/admin/Home")}
+              className="hover:text-purple-300 cursor-pointer font-semibold"
+            >
+              Dashboard
+            </p>
+
+            <p
+              onClick={() => router.push(userData?.role === "user" ? "/student/FindJob" : "/admin/ManageJobs")}
+              className="hover:text-purple-300 cursor-pointer font-semibold"
+            >
+              {userData?.role === "user" ? "Find Jobs" : "Manage Jobs"}
+            </p>
+
+            <p
+              onClick={() => router.push(userData?.role === "user" ? "/student/AppliedJob" : "/admin/post-job")}
+              className="hover:text-purple-300 cursor-pointer font-semibold"
+            >
+              {userData?.role === "user" ? "Applied Jobs" : "Post Jobs"}
+            </p>
+
+            <p
+              onClick={() => router.push(userData?.role === "user" ? "/student/Profile" : "/admin/Profile")}
+              className="hover:text-purple-300 cursor-pointer font-semibold"
+            >
+              Profile
+            </p>
+
             <div
               onClick={handleLogout}
               className="bg-red-500 w-full p-2 rounded-xl text-center cursor-pointer"

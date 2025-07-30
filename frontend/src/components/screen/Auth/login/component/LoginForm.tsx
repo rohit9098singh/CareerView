@@ -39,14 +39,18 @@ const LoginForm = () => {
         try {
             setLoading(true);
             const response = await loginUser(data);
-            const role = response?.data?.role;
+            const { token, role, name, email } = response.data;
 
-            if (role === "user") {
-                toast.success("User logged in successfully !");
-                router.push("/student/Home");
-            } else if (role === "admin") {
-                toast.success("Admin logged in successfully");
-                router.push("/admin/Home");
+            if (role === "user" || role === "admin") {
+                // Store token and user data
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify({ name, email, role }));
+                
+                // Show success message
+                toast.success(`${role === 'user' ? 'User' : 'Admin'} logged in successfully!`);
+                
+                // Redirect based on role
+                router.push(role === 'user' ? "/student/Home" : "/admin/Home");
             } else {
                 toast.error("Invalid role");
             }

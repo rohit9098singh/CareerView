@@ -2,16 +2,12 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-  className?: string
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  className?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, value: propValue, defaultValue, onChange, ...props }, ref) => {
-    // Only pass value prop if it's explicitly provided
-    const inputProps = propValue !== undefined ? { value: propValue, onChange } : { defaultValue };
-
+  ({ className, type, value, onChange, ...props }, ref) => {
     return (
       <input
         type={type}
@@ -22,9 +18,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className
         )}
         ref={ref}
+        value={value}
+        onChange={onChange}
         data-slot="input"
         {...props}
-        {...inputProps}
       />
     );
   }
