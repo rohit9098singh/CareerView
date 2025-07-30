@@ -16,14 +16,9 @@ const allowedOrigins = [
   "https://career-view-64v6.vercel.app",
   "http://localhost:3000"
 ];
-const vercelPreviewRegex = /^https:\/\/career-view-64v6-[a-z0-9]+-rohit9098singhs-projects\.vercel\.app$/;
 const corsOption = {
   origin: function (origin, callback) {
-    if (
-      !origin ||
-      allowedOrigins.includes(origin) ||
-      vercelPreviewRegex.test(origin)
-    ) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
@@ -33,7 +28,6 @@ const corsOption = {
 };
 
 app.use(cors(corsOption));
-app.options("*", cors(corsOption));
 app.use(express.json());
 app.use(cookieParser());
 
