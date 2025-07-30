@@ -86,16 +86,16 @@ jobs:
             npm install --force
 
             # Create the .env file with the specified environment variables
-            echo "EMAIL_ID=${{ secrets.EMAIL_ID }}" > /home/ubuntu/careerView-Backend/.env
+            echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" > /home/ubuntu/careerView-Backend/.env
             echo "EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}" >> /home/ubuntu/careerView-Backend/.env
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> /home/ubuntu/careerView-Backend/.env
-            echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "MONGO_URI=${{ secrets.MONGODB_URI }}" >> /home/ubuntu/careerView-Backend/.env
             echo "PORT=${{ vars.Backend_PORT || '8080' }}" >> /home/ubuntu/careerView-Backend/.env
             echo "FRONTEND_URL=${{ vars.FRONTEND_URL }}" >> /home/ubuntu/careerView-Backend/.env
             echo "NODE_ENV=production" >> /home/ubuntu/careerView-Backend/.env
-            echo "CLOUDANARY_CLOUD_NAME=${{ secrets.CLOUDANARY_CLOUD_NAME }}" >> /home/ubuntu/careerView-Backend/.env
-            echo "CLOUDANARY_APIKEY=${{ secrets.CLOUDANARY_APIKEY }}" >> /home/ubuntu/careerView-Backend/.env
-            echo "CLOUDANARY_SECRETS=${{ secrets.CLOUDANARY_SECRETS }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "CLOUDINARY_NAME=${{ secrets.CLOUDINARY_NAME }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> /home/ubuntu/careerView-Backend/.env
+            echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> /home/ubuntu/careerView-Backend/.env
             echo "GOOGLE_APIKEY=${{ secrets.GOOGLE_APIKEY }}" >> /home/ubuntu/careerView-Backend/.env
             echo "GOOGLE_CLIENTID=${{ secrets.GOOGLE_CLIENTID }}" >> /home/ubuntu/careerView-Backend/.env
 
