@@ -14,6 +14,7 @@ const app = express();
 
 const allowedOrigins = [
   "https://career-view-64v6.vercel.app",
+  "https://career-view-64v6-aowj0hv6y-rohit9098singhs-projects.vercel.app",
   "http://localhost:3000"
 ];
 const corsOption = {
