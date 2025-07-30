@@ -21,7 +21,7 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/",authRoute);
+app.use("/api/v1",authRoute);
 app.use("/api/v1",jobRoute)
 
 const PORT = process.env.PORT || 8000;
