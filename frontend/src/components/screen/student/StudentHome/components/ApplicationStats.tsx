@@ -24,18 +24,23 @@ const ApplicationStats = () => {
   const statsArray = Object.entries(stats).map(([name, count]) => ({ name, count }));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Application Stats</CardTitle>
+    <Card className="overflow-hidden border-primary/5 shadow-md">
+      <CardHeader className="bg-secondary/30 pb-4">
+        <CardTitle className="text-lg font-bold tracking-tight">Application Stats</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="pt-6">
+        <div className="space-y-5">
           {statsArray.map((stat) => (
-            <div key={stat.name} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <span>{stat.name}</span>
+            <div key={stat.name} className="flex items-center justify-between group">
+              <div className="flex items-center space-x-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors capitalize">
+                  {stat.name.replace(/([A-Z])/g, ' $1').trim()}
+                </span>
               </div>
-              <span className="font-medium text-purple-600">{stat.count}</span>
+              <span className="font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md text-sm">
+                {stat.count}
+              </span>
             </div>
           ))}
         </div>

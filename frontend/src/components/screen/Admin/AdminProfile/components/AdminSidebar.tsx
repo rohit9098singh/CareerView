@@ -1,91 +1,98 @@
+import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Briefcase,  MapPin, Settings, ShieldCheck} from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Briefcase, MapPin, Settings, ShieldCheck, Mail, Sparkles, Lock, ShieldAlert } from "lucide-react"
 import { useRouter } from "next/navigation"
-import {  userProfilePayloadType } from "../../../../../../types/updateProfileResponse"
+import { userProfilePayloadType } from "../../../../../../types/updateProfileResponse"
+import { motion } from "framer-motion"
 
 interface PersonalInformationProps {
   adminProfile: userProfilePayloadType | null;
 }
 
-
 export const AdminSidebar: React.FC<PersonalInformationProps> = ({ adminProfile }) => {
   const router = useRouter();
 
-  console.log("hello baby",adminProfile?.profilePicture)
+  const userplaceholder = adminProfile?.name?.split(" ").map((n: string) => n[0]).join("") || "AD";
 
-  const userplaceholder = adminProfile?.name.split(" ").map((n) => n[0]).join("");
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center mb-6">
-          <Avatar className="w-24 h-24 bg-blue-600 mb-4">
-            <AvatarImage src={adminProfile?.profilePicture} alt="Admin Avatar" />
-            <AvatarFallback className="text-2xl text-white">
-              {userplaceholder}
-            </AvatarFallback>
-          </Avatar>
-
-          <h2 className="text-xl font-bold">{adminProfile?.name}</h2>
-          <p className="text-muted-foreground">{adminProfile?.email}</p>
-        </div>
-        <div className="space-y-4 border-t pt-4">
-          <div className="flex items-center gap-3 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 px-4 py-2 rounded-xl shadow-md animate-fade-in">
-            <Briefcase className="h-5 w-5 text-blue-600" />
-            <span className="font-semibold text-lg tracking-wide">Welcome to <span className="text-blue-900 font-bold">CareerView</span></span>
-          </div>
-
-
-        </div>
-
-        <div className="space-y-2 mb-6 mt-3">
-          <div className="flex items-center gap-2 p-1 text-gray-700">
-            <MapPin className="w-5 h-5 text-muted-foreground" />
-            <span>{adminProfile?.location}</span>
-          </div>
-          <div className="flex items-center gap-2 p-1 rounded-lg">
-            <ShieldCheck className="w-5 h-5 text-muted-foreground" />
-            <span>Administrator</span>
-          </div>
-
-          <div onClick={() => router.push("/admin/settings")} className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 cursor-pointer">
-            <Settings className="w-5 h-5 text-muted-foreground" />
-            <span>System Settings</span>
-          </div>
-        </div>
-
-        <Separator className="my-6" />
-
-        <div className="mb-6">
-          <h3 className="font-medium mb-3">Permissions</h3>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">Manage Users</Badge>
-            <Badge variant="secondary">Review Courses</Badge>
-            <Badge variant="secondary">Access Reports</Badge>
-            <Badge variant="secondary">Moderate Content</Badge>
-          </div>
-        </div>
-
-        {/* <Separator className="my-6" />
-  
-          <div>
-            <h3 className="font-medium mb-3">Admin Docs</h3>
-            <div className="border rounded-md p-3 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">admin_policy.pdf</p>
-                  <p className="text-sm text-muted-foreground">Uploaded: 2024-04-01</p>
-                </div>
-                <FileText className="w-5 h-5 text-muted-foreground" />
+    <Card className="border-primary/5 shadow-2xl rounded-[2.5rem] overflow-hidden bg-background">
+      <div className="h-4 bg-primary w-full" />
+      <CardContent className="p-10">
+        <div className="flex flex-col items-center text-center mb-10">
+          <div className="relative group mb-6">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative"
+            >
+              <Avatar className="w-32 h-32 border-8 border-secondary shadow-xl relative z-10">
+                <AvatarImage src={adminProfile?.profilePicture} alt="Admin Avatar" className="object-cover" />
+                <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black italic">
+                  {userplaceholder}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-transparent rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
+              <div className="absolute -bottom-2 -right-2 bg-primary text-white p-2 rounded-xl shadow-lg z-20">
+                <ShieldCheck className="h-5 w-5" />
               </div>
+            </motion.div>
+          </div>
+
+          <h2 className="text-3xl font-black text-foreground tracking-tight italic mb-2">{adminProfile?.name}</h2>
+          <div className="flex items-center gap-2 text-muted-foreground font-black text-sm uppercase tracking-widest bg-secondary/30 px-4 py-1.5 rounded-full border border-secondary">
+            <Mail className="h-3.5 w-3.5 text-primary" />
+            <span>{adminProfile?.email}</span>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="p-6 rounded-[2rem] bg-primary/5 border border-primary/10 relative overflow-hidden group">
+            <Sparkles className="absolute top-4 right-4 h-5 w-5 text-primary/20 transition-transform group-hover:rotate-12" />
+            <div className="flex items-center gap-3 mb-1">
+              <ShieldAlert className="h-5 w-5 text-primary" />
+              <span className="text-sm font-black text-primary uppercase tracking-widest leading-none pt-0.5">Access Authorization</span>
             </div>
-            <Button variant="outline" className="w-full">
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Document
-            </Button>
-          </div> */}
+            <p className="text-lg font-black text-foreground italic">System Super-User</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="p-5 rounded-3xl bg-secondary/10 border border-secondary flex items-center justify-between">
+              <div className="flex items-center gap-3 text-primary">
+                <MapPin className="h-5 w-5" />
+                <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">Location Node</span>
+              </div>
+              <span className="text-sm font-bold text-foreground italic">{adminProfile?.location || "Remote Hub"}</span>
+            </div>
+
+            <motion.div
+              whileHover={{ x: 5 }}
+              onClick={() => router.push("/admin/settings")}
+              className="p-5 rounded-3xl bg-secondary/5 border border-secondary hover:border-primary/20 hover:bg-background transition-all cursor-pointer flex items-center justify-between group"
+            >
+              <div className="flex items-center gap-3 text-muted-foreground group-hover:text-primary transition-colors">
+                <Settings className="h-5 w-5" />
+                <span className="text-xs font-black uppercase tracking-widest">Core Configurations</span>
+              </div>
+              <Lock className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary/40 transition-colors" />
+            </motion.div>
+          </div>
+        </div>
+
+        <div className="mt-10 pt-10 border-t border-secondary">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] mb-6">Strategic Clearances</h3>
+          <div className="flex flex-wrap gap-2">
+            {["Manage Users", "Access Security Tokens", "System Audit", "Moderate Ecosystem"].map((permission, idx) => (
+              <Badge
+                key={idx}
+                variant="outline"
+                className="bg-background border-secondary hover:border-primary/30 transition-colors text-foreground font-bold px-3 py-1.5 rounded-xl cursor-default"
+              >
+                {permission}
+              </Badge>
+            ))}
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

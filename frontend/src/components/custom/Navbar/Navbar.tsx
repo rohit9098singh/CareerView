@@ -15,42 +15,34 @@ import { logoutUser, verifyAuth } from "@/components/services/auth.service";
 import { toast } from "react-hot-toast";
 import { userProfilePayloadType } from "../../../../types/updateProfileResponse";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from "@/components/ui/button";
+
+import { useAuth } from "@/context/AuthContext";
 
 const Navbar = () => {
-  // const user = "student"; // Replace with actual user type logic
+  const { user: userData, logout: logoutUser } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userData, setUserData] = useState<userProfilePayloadType | null>(null)
   const [isProfileDropDownOpen, setIsProfileDropDownOpen] = useState(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const toggleMenuBar = () => setIsMenuOpen(!isMenuOpen);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await verifyAuth();
-        if (response?.status === "success" && response?.data) {
-          const data = response?.data;
-          setUserData(data);
-        }
-      } catch (error: any) {
-        toast.error("Failed to load profile data", error);
-      }
-    };
-    fetchUserProfile();
-  }, []);
-
-  const userPlaceholder = userData?.name?.toUpperCase().split(" ").map((name) => name[0]).join("");
+  const userPlaceholder = userData?.name
+    ? userData.name.toUpperCase().split(" ").map((name) => name[0]).join("")
+    : "??";
 
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
-      toast.success("Logged out successfully");
-      router.push("/login");
+      if (logoutUser) {
+        await logoutUser();
+        toast.success("Logging out...");
+        // AuthContext now handles the window.location.href = "/login"
+      }
     } catch (error: any) {
-      toast.error("Logout failed", error);
+      toast.error("Logout failed");
+      console.error(error);
     }
   };
 
@@ -68,142 +60,170 @@ const Navbar = () => {
   }, []);
 
   return (
-    <div className="bg-purple-900 shadow-md p-4 h-[64px] fixed top-0 w-full z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <div className="bg-primary shadow-lg p-4 h-[72px] fixed top-0 w-full z-50 border-b border-primary/10">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-full">
         <div
-          onClick={() =>
-            router.push(userData?.role === "userg" ? "/student/Home" : "/admin/Home")
-          }
-          className="flex items-center cursor-pointer"
+          onClick={() => {
+            if (userData?.role === "user") router.push("/student/Home");
+            else if (userData?.role === "admin") router.push("/admin/Home");
+            else router.push("/login");
+          }}
+          className="flex items-center cursor-pointer group"
         >
-          <BriefcaseBusiness className="mr-2 h-6 w-6 text-white" />
-          <span className="font-bold text-lg text-white">CareerView</span>
+          <div className="bg-white/20 p-1.5 rounded-lg mr-3 group-hover:bg-white/30 transition-all">
+            <BriefcaseBusiness className="h-6 w-6 text-white" />
+          </div>
+          <span className="font-extrabold text-2xl tracking-tighter text-white italic">CareerView</span>
         </div>
 
-        {userData?.role === "user" ? (
-          <div className="hidden sm:flex items-center gap-4 text-white">
+        {userData?.role === "user" && (
+          <div className="hidden md:flex items-center gap-8 text-white/90">
             <p
               onClick={() => router.push("/student/Home")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Dashboard
             </p>
             <p
               onClick={() => router.push("/student/FindJob")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Find Jobs
             </p>
             <p
               onClick={() => router.push("/student/AppliedJob")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Applied Jobs
             </p>
             <p
               onClick={() => router.push("/student/saved-jobs")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Saved Jobs
             </p>
-            <p
+            <div
               onClick={() => setIsProfileDropDownOpen(!isProfileDropDownOpen)}
-              className="flex items-center gap-2 hover:bg-gray-200 bg-gray-100 px-2 py-1 cursor-pointer rounded-md text-black"
+              className="flex items-center gap-3 hover:bg-white/20 bg-white/10 px-4 py-2 cursor-pointer rounded-full text-white transition-all ring-1 ring-white/20 shadow-sm"
             >
-              <Avatar className="w-6 h-6">
+              <Avatar className="w-8 h-8 border border-white/30 shadow-sm">
                 <AvatarImage src={userData?.profilePicture || ""} alt="User Avatar" />
-                <AvatarFallback className="bg-gray-500 text-white text-xs font-semibold">
+                <AvatarFallback className="bg-primary/50 text-white text-xs font-black">
                   {userPlaceholder}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">Profile</span>
-            </p>
-
+              <span className="text-sm font-bold tracking-tight">Profile</span>
+            </div>
           </div>
-        ) : (
-          <div className="hidden sm:flex items-center gap-4 text-white">
+        )}
+
+        {userData?.role === "admin" && (
+          <div className="hidden md:flex items-center gap-8 text-white/90">
             <p
               onClick={() => router.push("/admin/Home")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Dashboard
             </p>
             <p
               onClick={() => router.push("/admin/ManageJobs")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Manage Jobs
             </p>
             <p
               onClick={() => router.push("/admin/post-job")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
+              className="hover:text-white cursor-pointer font-bold text-sm uppercase tracking-widest transition-all hover:scale-105"
             >
               Post Jobs
             </p>
-            <p
+            <div
               onClick={() => setIsProfileDropDownOpen(!isProfileDropDownOpen)}
-              className="flex items-center gap-2 hover:bg-gray-200 bg-gray-100 px-2 py-1 cursor-pointer rounded-md text-black"
+              className="flex items-center gap-3 hover:bg-white/20 bg-white/10 px-4 py-2 cursor-pointer rounded-full text-white transition-all ring-1 ring-white/20 shadow-sm"
             >
-              <Avatar className="w-6 h-6">
+              <Avatar className="w-8 h-8 border border-white/30 shadow-sm">
                 <AvatarImage src={userData?.profilePicture || ""} alt="User Avatar" />
-                <AvatarFallback className="bg-purple-600 text-white text-xs font-semibold">
+                <AvatarFallback className="bg-primary/50 text-white text-xs font-black">
                   {userPlaceholder}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm font-medium">Profile</span>
-            </p>
+              <span className="text-sm font-bold tracking-tight">Profile</span>
+            </div>
+          </div>
+        )}
+
+        {!userData && (
+          <div className="hidden md:flex items-center gap-4">
+            <Button
+              onClick={() => router.push("/login")}
+              variant="ghost"
+              className="text-white hover:bg-white/20 font-bold"
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => router.push("/signup")}
+              className="bg-white text-primary hover:bg-white/90 font-bold rounded-xl"
+            >
+              Join Now
+            </Button>
           </div>
         )}
 
         {/* Profile Dropdown */}
         {isProfileDropDownOpen && (
-          <div
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             ref={dropdownRef}
-            className="absolute right-6 top-16 bg-white rounded-xl shadow-md w-58 p-4 z-10"
+            className="absolute right-6 top-20 bg-white rounded-2xl shadow-2xl w-64 p-2 z-10 border border-secondary"
           >
-            <div className="border-b pb-2 mb-2">
-              <p className="font-semibold text-black">
+            <div className="px-4 py-3 border-b border-secondary mb-1">
+              <p className="font-bold text-foreground truncate">
                 {userData?.email}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-muted-foreground font-medium truncate">
                 {userData?.name}
               </p>
             </div>
 
-            <p
-              onClick={() =>
-                router.push(userData?.role === "user" ? "/student/Profile" : "/admin/Profile")
-              }
-              className="flex items-center hover:text-purple-300 hover:bg-gray-100 cursor-pointer border-b mb-2 px-2 py-1 rounded"
+            <div
+              onClick={() => {
+                if (userData?.role === "user") router.push("/student/Profile");
+                else if (userData?.role === "admin") router.push("/admin/Profile");
+              }}
+              className="flex items-center gap-3 text-muted-foreground hover:text-primary hover:bg-primary/5 cursor-pointer px-4 py-2.5 rounded-xl transition-all font-medium"
             >
-              <Avatar className="h-5 w-5 mr-2">
+              <Avatar className="h-6 w-6">
                 <AvatarImage src={userData?.profilePicture || ""} alt="User Avatar" />
-                <AvatarFallback className="bg-purple-600 text-white text-[10px] font-semibold">
+                <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-black">
                   {userPlaceholder}
                 </AvatarFallback>
               </Avatar>
               Profile
-            </p>
+            </div>
 
-            <p
-              onClick={() =>
-                router.push(
-                  userData?.role === "user" ? "/student/settings" : "/admin/settings"
-                )
-              }
-              className="flex items-center hover:text-purple-300 hover:bg-gray-100 cursor-pointer border-b mb-2 px-2 py-1 rounded"
+            <div
+              onClick={() => {
+                if (userData?.role === "user") router.push("/student/settings");
+                else if (userData?.role === "admin") router.push("/admin/settings");
+              }}
+              className="flex items-center gap-3 text-muted-foreground hover:text-primary hover:bg-primary/5 cursor-pointer px-4 py-2.5 rounded-xl transition-all font-medium"
             >
-              <Settings className="h-5 w-5 mr-2" />
+              <Settings className="h-5 w-5" />
               Settings
-            </p>
-            <p
-              onClick={handleLogout}
-              className="flex items-center gap-2 hover:text-red-500 hover:bg-gray-100 cursor-pointer px-2 py-1 rounded"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Logout</span>
-            </p>
-          </div>
+            </div>
+
+            <div className="pt-1 mt-1 border-t border-secondary">
+              <div
+                onClick={handleLogout}
+                className="flex items-center gap-3 text-red-500 hover:bg-red-50 cursor-pointer px-4 py-2.5 rounded-xl transition-all font-bold"
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Logout</span>
+              </div>
+            </div>
+          </motion.div>
         )}
 
         {/* Mobile Menu Icon */}
@@ -227,39 +247,88 @@ const Navbar = () => {
             className="absolute top-full left-4 right-4 mt-2 rounded-lg px-4 py-8 bg-white shadow-md space-y-2"
           >
             <p
-              onClick={() => router.push(userData?.role === "user" ? "/student/Home" : "/admin/Home")}
+              onClick={() => {
+                if (userData?.role === "user") router.push("/student/Home");
+                else if (userData?.role === "admin") router.push("/admin/Home");
+                else router.push("/login");
+              }}
               className="hover:text-purple-300 cursor-pointer font-semibold"
             >
               Dashboard
             </p>
 
-            <p
-              onClick={() => router.push(userData?.role === "user" ? "/student/FindJob" : "/admin/ManageJobs")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
-            >
-              {userData?.role === "user" ? "Find Jobs" : "Manage Jobs"}
-            </p>
+            {userData?.role === "user" && (
+              <>
+                <p
+                  onClick={() => router.push("/student/FindJob")}
+                  className="hover:text-purple-300 cursor-pointer font-semibold"
+                >
+                  Find Jobs
+                </p>
+                <p
+                  onClick={() => router.push("/student/AppliedJob")}
+                  className="hover:text-purple-300 cursor-pointer font-semibold"
+                >
+                  Applied Jobs
+                </p>
+              </>
+            )}
+
+            {userData?.role === "admin" && (
+              <>
+                <p
+                  onClick={() => router.push("/admin/ManageJobs")}
+                  className="hover:text-purple-300 cursor-pointer font-semibold"
+                >
+                  Manage Jobs
+                </p>
+                <p
+                  onClick={() => router.push("/admin/post-job")}
+                  className="hover:text-purple-300 cursor-pointer font-semibold"
+                >
+                  Post Jobs
+                </p>
+              </>
+            )}
 
             <p
-              onClick={() => router.push(userData?.role === "user" ? "/student/AppliedJob" : "/admin/post-job")}
-              className="hover:text-purple-300 cursor-pointer font-semibold"
-            >
-              {userData?.role === "user" ? "Applied Jobs" : "Post Jobs"}
-            </p>
-
-            <p
-              onClick={() => router.push(userData?.role === "user" ? "/student/Profile" : "/admin/Profile")}
+              onClick={() => {
+                if (userData?.role === "user") router.push("/student/Profile");
+                else if (userData?.role === "admin") router.push("/admin/Profile");
+              }}
               className="hover:text-purple-300 cursor-pointer font-semibold"
             >
               Profile
             </p>
 
-            <div
-              onClick={handleLogout}
-              className="bg-red-500 w-full p-2 rounded-xl text-center cursor-pointer"
-            >
-              <p className="font-semibold text-white">Logout</p>
-            </div>
+            {!userData && (
+              <div className="flex flex-col gap-2 pt-4">
+                <Button
+                  onClick={() => router.push("/login")}
+                  variant="outline"
+                  className="w-full font-bold rounded-xl border-primary text-primary"
+                >
+                  Login
+                </Button>
+                <Button
+                  onClick={() => router.push("/signup")}
+                  className="w-full bg-primary text-white font-bold rounded-xl"
+                >
+                  Join CareerView
+                </Button>
+              </div>
+            )}
+
+            {userData && (
+              <div
+                onClick={handleLogout}
+                className="bg-red-500 w-full p-3 rounded-xl text-center cursor-pointer mt-4"
+              >
+                <p className="font-semibold text-white flex items-center justify-center gap-2">
+                  <LogOut className="h-4 w-4" /> Logout
+                </p>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

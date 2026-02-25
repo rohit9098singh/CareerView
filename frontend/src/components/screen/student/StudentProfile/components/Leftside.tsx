@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Briefcase,  MapPin, School } from 'lucide-react'
-import {  userProfilePayloadType } from '../../../../../../types/updateProfileResponse'
+import { Briefcase, MapPin, School, Mail, Star, Sparkles } from 'lucide-react'
+import { userProfilePayloadType } from '../../../../../../types/updateProfileResponse'
 import { verifyAuth } from '@/components/services/auth.service'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { motion } from 'framer-motion'
 
 
 interface PersonalInformationProps {
@@ -32,57 +34,90 @@ const Leftside: React.FC<PersonalInformationProps> = () => {
 
   }, [])
 
- const userPlaceholder=userInfo?.name?.split(" ").map((name)=>name[0]).join("");
+  const userPlaceholder = userInfo?.name?.split(" ").map((n: string) => n[0]).join("");
 
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center mb-6">
-          <Avatar className="w-24 h-24 mb-4">
-            <AvatarImage src={userInfo?.profilePicture || ""} alt="User Avatar" />
-            <AvatarFallback className="bg-purple-900 text-white text-2xl font-semibold">
-             {userPlaceholder}
-            </AvatarFallback>
-          </Avatar>
-          <h2 className="text-xl font-semibold">{userInfo?.name}</h2>
-          <div className="text-gray-500 mt-1">{userInfo?.email}</div>
-        </div>
-
-        <div className="space-y-4 border-t pt-4">
-          <div className="flex items-center gap-3 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 px-4 py-2 rounded-xl shadow-md animate-fade-in">
-            <Briefcase className="h-5 w-5 text-blue-600" />
-            <span className="font-semibold text-lg tracking-wide">Welcome to <span className="text-blue-900 font-bold">CareerView</span></span>
+    <Card className="border-primary/5 shadow-2xl rounded-[2.5rem] overflow-hidden bg-background">
+      <div className="h-4 bg-primary w-full" />
+      <CardContent className="p-10">
+        <div className="flex flex-col items-center text-center mb-10">
+          <div className="relative group mb-6">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative"
+            >
+              <Avatar className="w-32 h-32 border-8 border-secondary shadow-xl relative z-10">
+                <AvatarImage src={userInfo?.profilePicture || ""} alt="User Avatar" className="object-cover" />
+                <AvatarFallback className="bg-primary/10 text-primary text-4xl font-black italic">
+                  {userPlaceholder}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-transparent rounded-full blur opacity-20 group-hover:opacity-40 transition-opacity" />
+            </motion.div>
           </div>
 
-          <div className="flex items-center gap-2 text-gray-700">
-            <MapPin className="h-4 w-4" />
-            <span>{userInfo?.location}</span>
+          <h2 className="text-3xl font-black text-foreground tracking-tight italic mb-2">{userInfo?.name}</h2>
+          <div className="flex items-center gap-2 text-muted-foreground font-black text-sm uppercase tracking-widest bg-secondary/30 px-4 py-1.5 rounded-full border border-secondary">
+            <Mail className="h-3.5 w-3.5 text-primary" />
+            <span>{userInfo?.email}</span>
           </div>
         </div>
 
-        <div className="border-t mt-6 pt-4">
-          <h3 className="text-sm font-medium mb-3">Top Skills :</h3>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {userInfo?.skills[0]?.split(',').map((skill: string, index: number) => (
-              <span
+        <div className="space-y-6">
+          <div className="p-6 rounded-[2rem] bg-primary/5 border border-primary/10 relative overflow-hidden group">
+            <Sparkles className="absolute top-4 right-4 h-5 w-5 text-primary/20 transition-transform group-hover:rotate-12" />
+            <div className="flex items-center gap-3 mb-1">
+              <Briefcase className="h-5 w-5 text-primary" />
+              <span className="text-sm font-black text-primary uppercase tracking-widest leading-none pt-0.5">Professional Rank</span>
+            </div>
+            <p className="text-lg font-black text-foreground italic">CareerView Pioneer</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-5 rounded-3xl bg-secondary/10 border border-secondary flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-primary">
+                <MapPin className="h-4 w-4" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Base</span>
+              </div>
+              <span className="text-sm font-bold text-foreground line-clamp-1 italic">{userInfo?.location || "Remote"}</span>
+            </div>
+
+            <div className="p-5 rounded-3xl bg-secondary/10 border border-secondary flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-primary">
+                <Star className="h-4 w-4" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Status</span>
+              </div>
+              <span className="text-sm font-bold text-foreground line-clamp-1 italic">Active Explorer</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 pt-10 border-t border-secondary">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] mb-6">Strategic Skills</h3>
+          <div className="flex flex-wrap gap-2">
+            {(Array.isArray(userInfo?.skills)
+              ? userInfo.skills
+              : userInfo?.skills?.split(',').map((s: string) => s.trim()).filter(Boolean) || []
+            ).map((skill: string, index: number) => (
+              <Badge
                 key={index}
-                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full"
+                variant="outline"
+                className="bg-background border-secondary hover:border-primary/30 transition-colors text-foreground font-bold px-3 py-1.5 rounded-xl cursor-default"
               >
                 {skill.trim()}
-              </span>
+              </Badge>
             ))}
           </div>
         </div>
 
-        <div className="border-t mt-6 pt-6 flex items-center gap-4 bg-gray-50 rounded-lg px-4 py-3">
-          <h3 className="text-sm font-semibold text-gray-700 min-w-[90px]">Studying At:</h3>
-          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md shadow-sm border border-gray-200">
-            <p className="text-sm text-blue-700 font-medium">{userInfo?.studyingAt || "N/A"}</p>
-            <School className="h-5 w-5 text-blue-500" />
+        <div className="mt-10 p-6 rounded-[2rem] bg-secondary/20 border border-secondary shadow-inner">
+          <div className="flex items-center gap-3 mb-2">
+            <School className="h-5 w-5 text-primary" />
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Educational Hub</span>
           </div>
+          <p className="text-base font-black text-foreground italic leading-tight">{userInfo?.studyingAt || "N/A"}</p>
         </div>
-
       </CardContent>
     </Card>
   )

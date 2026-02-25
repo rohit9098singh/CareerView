@@ -24,13 +24,13 @@ const RecentApplications = () => {
                 } else {
                     console.error("Unexpected response format:", response);
                 }
-            } catch (error:any) {
-                console.error("Something went wrong. Try again later.",error);
+            } catch (error: any) {
+                console.error("Something went wrong. Try again later.", error);
             }
         }
         fetchData();
     }, []);
-   
+
 
     const handleJobClick = (id: string) => {
         router.push(`/student/JobDetails/${id}`);
@@ -38,59 +38,56 @@ const RecentApplications = () => {
 
 
     return (
-        <Card>
-            <CardHeader className='flex flex-row items-center justify-between pb-2'>
-                <CardTitle className='text-xl font-bold'>Recent Applications</CardTitle>
-                <Link href={"/student/FindJob"} className='text-sm text-purple-500 flex items-center'>
-                    View all <span className='ml-1'><MoveRight /></span>
+        <Card className="border-primary/5 shadow-md">
+            <CardHeader className='flex flex-row items-center justify-between pb-6 border-b border-secondary'>
+                <CardTitle className='text-xl font-bold tracking-tight'>Recent Applications</CardTitle>
+                <Link href={"/student/FindJob"} className='text-sm text-primary font-semibold flex items-center hover:opacity-80 transition-opacity'>
+                    View all <MoveRight className="ml-1.5 h-4 w-4" />
                 </Link>
             </CardHeader>
-            <CardContent className='space-y-4'>
+            <CardContent className='pt-6 space-y-4'>
                 {
                     jobs.slice(0, 5).map((application) => (
-                        <div key={application.jobId} className='border rounded-lg p-4 cursor-pointer'>
-                            <div className='flex justify-between items-start'>
-                                <div className="flex items-start gap-3">
-                                    {/* Company Logo */}
-                                    <Avatar className="w-10 h-10 mt-1">
+                        <div key={application.jobId} className='group border border-primary/5 rounded-xl p-5 hover:bg-secondary/20 transition-all hover:shadow-subtle cursor-pointer'>
+                            <div className='flex flex-col sm:flex-row justify-between items-start gap-4'>
+                                <div className="flex items-start gap-4">
+                                    <Avatar className="w-12 h-12 border border-secondary shadow-sm">
                                         <AvatarImage src={application.companyLogo} alt={application.companyName || "Company"} />
-                                        <AvatarFallback>{application.companyName?.[0] || "C"}</AvatarFallback>
+                                        <AvatarFallback className="bg-primary/5 text-primary font-bold">{application.companyName?.[0] || "C"}</AvatarFallback>
                                     </Avatar>
                                     <div>
-                                        <h3 className="font-semibold">{application.jobTitle}</h3>
+                                        <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors">{application.jobTitle}</h3>
 
-                                        <div className="flex items-center text-sm text-gray-500 mt-1 flex-wrap gap-x-2">
+                                        <div className="flex items-center text-sm text-muted-foreground mt-2 flex-wrap gap-x-3">
                                             <div className="flex items-center">
-                                                <Building className="h-3.5 w-3.5 mr-1" />
-                                                <span>{application.companyName}</span>
+                                                <Building className="h-3.5 w-3.5 mr-1.5 text-primary/60" />
+                                                <span className="font-medium">{application.companyName}</span>
                                             </div>
 
-                                            <span className="mx-2">•</span>
-
                                             <div className="flex items-center">
-                                                <MapPin className="h-3.5 w-3.5 mr-1" />
+                                                <MapPin className="h-3.5 w-3.5 mr-1.5 text-primary/60" />
                                                 <span>{application.location}</span>
                                             </div>
                                         </div>
 
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            Applied on {new Date(application.appliedAt).toLocaleDateString()}
+                                        <p className="text-xs text-muted-foreground mt-2 font-medium">
+                                            Applied on {new Date(application.appliedAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
                                         </p>
                                     </div>
                                 </div>
 
-                                <Badge className={getJobStatusBadgeClass(application.status)}>
-                                    <span className='px-4 py-1 font-semibold text-md'>
+                                <Badge className={`${getJobStatusBadgeClass(application.status)} border-none shadow-none`}>
+                                    <span className='px-3 py-0.5 font-bold text-xs uppercase tracking-wider'>
                                         {application.status.charAt(0).toUpperCase() + application.status.slice(1).replace("-", " ")}
                                     </span>
                                 </Badge>
 
                             </div>
-                            <div className='mt-3'>
+                            <div className='mt-5 flex justify-end'>
                                 <Button
                                     onClick={() => handleJobClick(application.jobId)}
-                                    className='w-32 border  bg-purple-900 hover:bg-purple-950 text-white cursor-pointer '
-                                    variant={"outline"}
+                                    className='px-6 font-bold shadow-sm'
+                                    variant={"default"}
                                     size={"sm"}
                                 >
                                     View job

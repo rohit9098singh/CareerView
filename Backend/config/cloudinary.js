@@ -11,9 +11,9 @@ cloudinary.config({
 });
 
 const uploadFileToCloudinary = (file) => {
-    return new Promise((resolve, reject) => {  
+    return new Promise((resolve, reject) => {
         const options = {
-            resource_type: file.mimetype.startsWith("video") ?  "video" : "image"
+            resource_type: "auto"
         };
         cloudinary.uploader.upload_stream(options, (error, result) => {
             if (error) {

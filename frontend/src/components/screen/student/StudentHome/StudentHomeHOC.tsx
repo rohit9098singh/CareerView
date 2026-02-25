@@ -4,13 +4,13 @@ import dynamic from "next/dynamic";
 const StudentHome = dynamic(() => import("./StudentHome"));
 
 export const StudentHomeHOC = () => {
-  return(
+  return (
     <div>
-    <Navbar />
-    <StudentHome />;
-</div>
+      <Navbar />
+      <StudentHome />;
+    </div>
   )
-  
-  
- 
+
+
+
 };

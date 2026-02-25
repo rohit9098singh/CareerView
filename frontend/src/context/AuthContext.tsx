@@ -6,13 +6,14 @@ type User = {
   name: string;
   email: string;
   role: string;
+  profilePicture?: string;
 } | null;
 
 interface AuthContextType {
   user: User;
   token: string | null;
   login: (token: string, userData: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,11 +39,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  const logout = async () => {
+    try {
+      // Import logoutUser from auth.service to clear cookies and backend session
+      const { logoutUser } = await import("@/components/services/auth.service");
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout service error:", error);
+    } finally {
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      // Explicitly redirect to login just in case
+      window.location.href = "/login";
+    }
   };
 
   return (
@@ -59,3 +70,6 @@ export const useAuth = () => {
   }
   return context;
 };
+
+
+

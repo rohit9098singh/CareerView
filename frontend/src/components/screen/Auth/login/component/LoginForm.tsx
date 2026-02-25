@@ -1,5 +1,6 @@
 "use client"
 import React, { useState } from "react"
+import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import {
     Form,
@@ -45,10 +46,10 @@ const LoginForm = () => {
                 // Store token and user data
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', JSON.stringify({ name, email, role }));
-                
+
                 // Show success message
                 toast.success(`${role === 'user' ? 'User' : 'Admin'} logged in successfully!`);
-                
+
                 // Redirect based on role
                 router.push(role === 'user' ? "/student/Home" : "/admin/Home");
             } else {
@@ -62,98 +63,105 @@ const LoginForm = () => {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-50">
-            <Card className="w-full max-w-md p-6 shadow-md">
-                <CardContent>
-                    <h2 className="text-2xl font-bold text-center mb-2">Welcome back</h2>
-                    <p className="text-center text-sm text-gray-600 mb-6">
-                        Enter your credentials to access your account
-                    </p>
+        <div className="flex justify-center items-center min-h-screen bg-secondary/50 p-4">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-md"
+            >
+                <Card className="shadow-lg border-primary/5">
+                    <CardContent className="pt-6">
+                        <h2 className="text-3xl font-extrabold text-center tracking-tight text-foreground mb-2">Welcome back</h2>
+                        <p className="text-center text-sm text-muted-foreground mb-8">
+                            Enter your credentials to access your account
+                        </p>
 
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Mail className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                                                <Input
-                                                    {...field}
-                                                    type="email"
-                                                    placeholder="your-email@example.com"
-                                                    className="pl-8"
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Password</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Lock className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                                                <Input
-                                                    {...field}
-                                                    type={showPassword ? "text" : "password"}
-                                                    placeholder="••••••••"
-                                                    className="pl-8 pr-8"
-                                                />
-                                                <div
-                                                    className="absolute right-2 top-2.5 cursor-pointer"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                >
-                                                    {showPassword ? (
-                                                        <EyeOff className="h-4 w-4 text-gray-400" />
-                                                    ) : (
-                                                        <Eye className="h-4 w-4 text-gray-400" />
-                                                    )}
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                                                    <Input
+                                                        {...field}
+                                                        type="email"
+                                                        placeholder="your-email@example.com"
+                                                        className="pl-8"
+                                                    />
                                                 </div>
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            <div
-                                onClick={() => router.push("/forgotPassword")}
-                                className="text-sm text-right text-violet-600 hover:underline cursor-pointer">
-                                Forgot your password?
-                            </div>
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Password</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+                                                    <Input
+                                                        {...field}
+                                                        type={showPassword ? "text" : "password"}
+                                                        placeholder="••••••••"
+                                                        className="pl-8 pr-8"
+                                                    />
+                                                    <div
+                                                        className="absolute right-2 top-2.5 cursor-pointer"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                    >
+                                                        {showPassword ? (
+                                                            <EyeOff className="h-4 w-4 text-gray-400" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4 text-gray-400" />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                            <Button type="submit" className="w-full bg-violet-500 hover:bg-violet-600" disabled={loading}>
-                                {loading ? "Signing in..." : "Sign in"}
-                            </Button>
-                        </form>
-                    </Form>
+                                <div
+                                    onClick={() => router.push("/forgotPassword")}
+                                    className="text-sm text-right text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer">
+                                    Forgot your password?
+                                </div>
 
-                    <div className="mt-6 text-center">
-                        <p className="text-xs text-gray-500 mt-2">
-                            Click a button to quickly log in with preset credentials
-                        </p>
-                        <p className="mt-4 text-sm">
-                            Don&apos;t have an account?{" "}
-                            <button
-                                disabled={loading}
-                                onClick={() => router.push("/signup")}
-                                className="text-violet-600 hover:underline cursor-pointer">
-                                {loading ? "Signing in..." : "Sign up"}
-                            </button>
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
+                                <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+                                    {loading ? "Signing in..." : "Sign in"}
+                                </Button>
+                            </form>
+                        </Form>
+
+                        <div className="mt-8 text-center">
+                            <p className="text-xs text-muted-foreground mt-2">
+                                Click a button to quickly log in with preset credentials
+                            </p>
+                            <p className="mt-6 text-sm text-muted-foreground">
+                                Don&apos;t have an account?{" "}
+                                <button
+                                    disabled={loading}
+                                    onClick={() => router.push("/signup")}
+                                    className="text-primary hover:text-primary/80 font-bold transition-colors cursor-pointer disabled:opacity-50">
+                                    {loading ? "Signing in..." : "Sign up"}
+                                </button>
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </motion.div>
         </div>
     )
 }

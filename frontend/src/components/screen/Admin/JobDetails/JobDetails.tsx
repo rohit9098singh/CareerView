@@ -2,50 +2,11 @@
 
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LayoutGrid, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import { Badge } from "@/components/ui/badge";
 import ApplicantsTable from "./components/ApplicantsTable";
 import { getJobDetails } from "@/components/services/job.service";
-
-// const job = {
-//   id: "1",
-//   title: "Web Developer",
-//   company: "TechVerse",
-//   location: "Bangalore",
-//   type: "Full-time",
-//   status: "active",
-//   posted: "4/29/2025",
-//   description: "We are looking for a skilled web developer to join our team...",
-//   requirements: "3+ years of experience with React, Next.js, and TypeScript...",
-//   salary: "$80,000 - $100,000",
-//   applicants: [
-//     {
-//       id: "a1",
-//       name: "John Doe",
-//       email: "john@example.com",
-//       experience: "4 years",
-//       status: "pending",
-//       appliedDate: "5/1/2025",
-//     },
-//     {
-//       id: "a2",
-//       name: "Jane Smith",
-//       email: "jane@example.com",
-//       experience: "5 years",
-//       status: "interviewed",
-//       appliedDate: "5/1/2025",
-//     },
-//     {
-//       id: "a3",
-//       name: "Mike Johnson",
-//       email: "mike@example.com",
-//       experience: "3 years",
-//       status: "rejected",
-//       appliedDate: "4/30/2025",
-//     },
-//   ],
-// };
+import { motion } from "framer-motion";
 
 const JobDetails = () => {
   const params = useParams();
@@ -58,11 +19,10 @@ const JobDetails = () => {
     const fetchJobDetails = async () => {
       try {
         if (jobId) {
-          const response = await getJobDetails(jobId);
+          const response = await getJobDetails(jobId as string);
           const job = response?.data?.jobDetails;
           setJobDetails(job);
         }
-
       } catch (error) {
         console.log("something went wrong", error)
       }
@@ -71,24 +31,61 @@ const JobDetails = () => {
     fetchJobDetails();
   }, [jobId]);
 
-  console.log("data of bhuwan", jobDetails);
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-700" />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="h-12 w-12 border-t-4 border-primary rounded-full"
+        />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mt-[70px] mx-auto px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <Button variant="outline" onClick={() => router.push("/admin/ManageJobs")} className="flex items-center">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Jobs
+    <div className="mx-auto mt-[80px] max-w-7xl px-4 py-12">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="mb-8"
+      >
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/admin/ManageJobs")}
+          className="flex items-center gap-2 font-black italic text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Inventory Return</span>
         </Button>
-      </div>
-      <ApplicantsTable />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-12"
+      >
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-wider mb-4">
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span>Detail Node Analysis</span>
+            </div>
+            <h1 className='text-5xl font-black text-foreground tracking-tight italic mb-2'>
+              {jobDetails ? (jobDetails as any).jobTitle : "Position Intel"}
+            </h1>
+            <p className="text-muted-foreground font-bold uppercase tracking-widest text-[10px]">Granular recruitment analytics and candidate orchestration</p>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <ApplicantsTable />
+      </motion.div>
     </div>
   );
 };

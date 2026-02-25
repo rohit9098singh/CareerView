@@ -27,15 +27,23 @@ export const postJob = async (req, res) => {
   } = req.body;
   let imageUrl = "";
   try {
+    console.log("postJob: Received file:", req.file ? req.file.originalname : "No file");
+    console.log("postJob: Request body keys:", Object.keys(req.body));
+    
     if (req.file) {
       try {
+        console.log("postJob: Uploading file to Cloudinary...");
         const result = await uploadFileToCloudinary(req.file);
         imageUrl = result.secure_url;
+        console.log("postJob: File uploaded successfully:", imageUrl);
       } catch (uploadError) {
-        console.error(uploadError);
+        console.error("postJob: Upload error:", uploadError);
         return response(res, 500, "Failed to upload company logo");
       }
+    } else {
+      console.error("postJob: No file received in request");
     }
+    
     if (!imageUrl) {
       return response(res, 400, "Company logo is required");
     }
@@ -79,7 +87,7 @@ export const postJob = async (req, res) => {
     // await sendNewJobPostedToAllUsers(newJob);
     return response(res, 201, "Job posted successfully", newJob);
   } catch (error) {
-    console.error(error);
+    console.error("postJob: Error:", error);
     return response(res, 500, "Failed to post the job", error.message);
   }
 };

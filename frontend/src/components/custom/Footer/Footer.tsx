@@ -3,15 +3,17 @@ import { Facebook, Twitter, Instagram, BriefcaseBusiness } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 py-8  text-gray-600 text-sm">
+    <footer className="bg-secondary/30 py-16 text-muted-foreground text-sm border-t border-secondary">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          <div className="text-center md:text-left">
-            <div className='flex gap-2 items-center'>
-             <BriefcaseBusiness className='h-5 w-5 mr-2 text-purple-400'/>
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">JobVista</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
+          <div className="text-center md:text-left space-y-6">
+            <div className='flex gap-3 items-center justify-center md:justify-start'>
+              <div className="bg-primary p-1.5 rounded-lg">
+                <BriefcaseBusiness className='h-5 w-5 text-white' />
+              </div>
+              <h4 className="text-2xl font-black text-foreground italic tracking-tighter">CareerView</h4>
             </div>
-            <p className="mb-2 max-w-2xl">Connecting students with their dream careers. Find your perfect job match today.</p>
+            <p className="leading-relaxed max-w-xs mx-auto md:mx-0 font-medium">Connecting ambitious talent with their dream careers. Find your perfect match today.</p>
             <div className="flex justify-center md:justify-start space-x-4">
               <Link href="#" className="hover:text-blue-500">
                 <Facebook className="h-5 w-5" />
@@ -55,8 +57,8 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-gray-200 pt-6 text-center">
-          <p>&copy; 2025 JobVista. All rights reserved.</p>
+        <div className="mt-16 border-t border-secondary pt-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest">&copy; {new Date().getFullYear()} CareerView. All rights reserved.</p>
         </div>
       </div>
     </footer>

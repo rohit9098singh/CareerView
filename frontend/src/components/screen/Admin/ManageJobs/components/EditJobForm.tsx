@@ -23,28 +23,28 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
 
   console.log(jobData)
 
-  console.log("first",jobData)
+  console.log("first", jobData)
   const form = useForm<EditFormType>({
     resolver: zodResolver(editFormSchema),
     defaultValues: jobData,
   });
 
-  const onSubmit =async (data: EditFormType) => {
+  const onSubmit = async (data: EditFormType) => {
     console.log('Updated job data:', data);
     try {
-         const response=await editJob(data);
-         console.log("hello eorld")
-         if(response.status=== "success"){
-          toast.success("job updated successfully !");
-          setTimeout(()=>{
-             window.location.reload();
-          },1000)
-         }
-         else{
-          console.log("something went wrong while editing",response?.error)
-         }
-    } catch (error:any) {
-        toast.error("something went wrong",error.message)
+      const response = await editJob(data);
+      console.log("hello eorld")
+      if (response.status === "success") {
+        toast.success("job updated successfully !");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000)
+      }
+      else {
+        console.log("something went wrong while editing", response?.error)
+      }
+    } catch (error: any) {
+      toast.error("something went wrong", error.message)
     }
   };
 
@@ -105,15 +105,6 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
               )}
             />
 
-            <FormField control={form.control} name="location" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
             <FormField
               control={form.control}
               name="companySize"
@@ -153,7 +144,7 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
                     Workplace Type <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Remote" />
                       </SelectTrigger>
@@ -207,7 +198,7 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
                     Job Type <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select job type" />
                       </SelectTrigger>
@@ -233,7 +224,7 @@ const EditJobForm: React.FC<EditJobFormProps> = ({ jobData }) => {
                     Job Status <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Select defaultValue={field.value} onValueChange={field.onChange}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Active" />
                       </SelectTrigger>

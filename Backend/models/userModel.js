@@ -7,10 +7,10 @@ const appliedJobSchema = new Schema({
   status: {
     type: String,
     enum: [
-      "Total Applications",
+      "pending",
       "accepted",
       "rejected",
-      "underReview",
+      "interview-schedule",
       "applied",
     ],
     default: "applied",
@@ -31,7 +31,7 @@ const userSchema = new Schema({
   location: { type: String },
   studyingAt: { type: String },
   resumeUrl: { type: String },
-  bio: { type: String }, 
+  bio: { type: String },
   skills: [{ type: String }],
   studyingAt: { type: String },
   savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],

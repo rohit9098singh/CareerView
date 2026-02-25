@@ -18,15 +18,17 @@ import { ApplynowFormSchema } from "./validation/ApplynowFormSchema";
 import toast from "react-hot-toast";
 import { applyJob } from "@/components/services/job.service";
 import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { Loader2, Sparkles, Send, FileUp } from "lucide-react";
 
 type ApplyInput = z.infer<typeof ApplynowFormSchema>;
 
 const ApplynowForm = () => {
+    const params = useParams();
+    const jobId = params.id as string;
 
-    const params=useParams();
-    const jobId=params.id;
+    const [loading, setLoading] = useState(false);
 
-    const [loading, setLoading] = useState(false)
     const form = useForm<ApplyInput>({
         resolver: zodResolver(ApplynowFormSchema),
         defaultValues: {
@@ -36,14 +38,19 @@ const ApplynowForm = () => {
     });
 
     const onSubmit = async (data: ApplyInput) => {
+        if (!data.resume || data.resume.length === 0) {
+            toast.error("Please upload your resume");
+            return;
+        }
+
         try {
             setLoading(true);
-            const response = await applyJob(jobId, data); 
+            const response = await applyJob(jobId, data);
             if (response.status === "success") {
-                toast.success("Job applied successfully");
+                toast.success("Job applied successfully! Good luck.");
                 form.reset();
             } else {
-                toast.error("Something went wrong");
+                toast.error(response.message || "Failed to apply");
             }
         } catch (error: any) {
             toast.error(error.message || "Error while applying");
@@ -51,28 +58,52 @@ const ApplynowForm = () => {
             setLoading(false);
         }
     };
-    
+
     return (
-        <div className="flex flex-col gap-6">
-            <h1 className="text-lg ml-4 font-bold">Apply Now</h1>
-            <hr />
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col gap-8 p-8"
+        >
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black text-foreground italic tracking-tight flex items-center gap-3">
+                        <Sparkles className="h-8 w-8 text-primary" />
+                        Complete Your Pitch
+                    </h1>
+                    <p className="text-muted-foreground font-medium mt-1">Show them why you're the perfect fit.</p>
+                </div>
+            </div>
+
+            <hr className="border-secondary" />
+
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-5 p-6 max-w-xl mx-auto"
+                    className="space-y-8"
                 >
                     <FormField
                         control={form.control}
                         name="resume"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Resume (PDF only)</FormLabel>
+                            <FormItem className="space-y-4">
+                                <FormLabel className="text-sm font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                                    <FileUp className="h-4 w-4 text-primary" />
+                                    Resume (PDF Required)
+                                </FormLabel>
                                 <FormControl>
-                                    <Input
-                                        type="file"
-                                        accept=".pdf"
-                                        onChange={(e) => field.onChange(e.target.files)}
-                                    />
+                                    <div className="relative group">
+                                        <Input
+                                            type="file"
+                                            accept=".pdf"
+                                            onChange={(e) => {
+                                                if (e.target.files) {
+                                                    field.onChange(e.target.files);
+                                                }
+                                            }}
+                                            className="h-14 py-4 px-6 border-2 border-dashed border-secondary hover:border-primary/50 transition-all rounded-2xl cursor-pointer file:bg-primary file:text-white file:rounded-lg file:font-black file:uppercase file:text-[10px] file:mr-4 file:px-4"
+                                        />
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -83,17 +114,14 @@ const ApplynowForm = () => {
                         control={form.control}
                         name="coverLetter"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    <span className="font-semibold">
-                                        Cover Letter (required)
-                                    </span>
+                            <FormItem className="space-y-4">
+                                <FormLabel className="text-sm font-black uppercase tracking-widest text-muted-foreground">
+                                    Your Narrative (Cover Letter)
                                 </FormLabel>
                                 <FormControl>
                                     <textarea
-                                        placeholder="Write your cover letter here..."
-                                        className="w-full p-2 border rounded"
-                                        rows={5}
+                                        placeholder="Pitch yourself! Why should they pick you?"
+                                        className="w-full h-48 p-6 text-lg font-medium border-2 border-secondary focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all outline-none rounded-3xl bg-secondary/5 resize-none placeholder:text-muted-foreground/40"
                                         {...field}
                                     />
                                 </FormControl>
@@ -102,14 +130,26 @@ const ApplynowForm = () => {
                         )}
                     />
 
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        
-                        {loading ? "Applying..." : "Apply Now"}
+                    <Button
+                        type="submit"
+                        className="w-full h-16 text-xl font-black rounded-2xl shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all gap-3"
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 className="h-6 w-6 animate-spin" />
+                                <span>Securing Role...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Send className="h-6 w-6" />
+                                <span>Submit Application</span>
+                            </>
+                        )}
                     </Button>
-
                 </form>
             </Form>
-        </div>
+        </motion.div>
     );
 };
 

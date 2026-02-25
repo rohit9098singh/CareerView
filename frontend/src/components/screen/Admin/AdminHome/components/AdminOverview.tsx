@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, User } from 'lucide-react';
+import { FileText, User, CheckCircle, Clock } from 'lucide-react';
 import React from 'react';
 
 type AdminStatsProps = {
@@ -18,45 +18,48 @@ const AdminOverview: React.FC<AdminStatsProps> = ({ stats }) => {
       title: 'Total Jobs',
       value: stats.totalJobs,
       description: 'All job postings',
-      icon: <FileText className="h-5 w-5 text-gray-600" />,
+      icon: <FileText className="h-5 w-5 text-primary" />,
     },
     {
       id: 2,
       title: 'Active Jobs',
       value: stats.activeJobs,
       description: 'Currently active postings',
-      icon: <FileText className="h-5 w-5 text-gray-600" />,
+      icon: <CheckCircle className="h-5 w-5 text-emerald-500" />,
     },
     {
       id: 3,
       title: 'Total Applicants',
       value: stats.totalApplicants,
-      description: 'Across all job postings',
-      icon: <User className="h-5 w-5 text-gray-600" />,
+      description: 'Across all postings',
+      icon: <User className="h-5 w-5 text-blue-500" />,
     },
     {
       id: 4,
       title: 'Pending Review',
       value: stats.pendingReview,
-      description: 'Applications needing review',
-      icon: <FileText className="h-5 w-5 text-gray-600" />,
+      description: 'Applications to review',
+      icon: <Clock className="h-5 w-5 text-amber-500" />,
     },
   ];
 
   return (
-    <div>
-      <h2 className="text-lg font-medium mb-3">Overview</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold tracking-tight text-foreground italic">System Overview</h2>
+        <div className="h-px bg-secondary flex-grow mx-4 hidden sm:block" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsData.map((stat) => (
-          <Card key={stat.id}>
-            <CardContent className="p-4">
+          <Card key={stat.id} className="border-primary/5 shadow-md hover:shadow-lg transition-all group">
+            <CardContent className="p-6">
               <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">{stat.title}</p>
-                  <p className="text-3xl font-bold mt-1">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-1">{stat.description}</p>
+                <div className="space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">{stat.title}</p>
+                  <p className="text-4xl font-black text-foreground">{stat.value}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/60">{stat.description}</p>
                 </div>
-                <div>{stat.icon}</div>
+                <div className="bg-secondary/50 p-3 rounded-2xl group-hover:bg-primary/10 transition-colors">{stat.icon}</div>
               </div>
             </CardContent>
           </Card>

@@ -8,6 +8,7 @@ import ApplicationStats from './components/ApplicationStats';
 import { getStudentApplicationStats } from '@/components/services/job.service';
 import { verifyAuth } from '@/components/services/auth.service';
 import { userProfilePayloadType } from '../../../../../types/updateProfileResponse';
+import { motion } from 'framer-motion';
 
 const StudentHome = () => {
   const [stats, setStats] = useState({
@@ -40,7 +41,12 @@ const StudentHome = () => {
   }, []);
 
   return (
-    <div className='mx-auto p-4 max-w-7xl mt-[64px]'>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className='mx-auto p-4 max-w-7xl mt-[64px]'
+    >
       <Header
         name={user?.name ?? "User"}
         totalApplications={stats?.totalApplications}
@@ -58,7 +64,7 @@ const StudentHome = () => {
           <ApplicationStats />
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
