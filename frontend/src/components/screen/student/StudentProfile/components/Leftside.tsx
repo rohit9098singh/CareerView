@@ -36,6 +36,15 @@ const Leftside: React.FC<PersonalInformationProps> = () => {
 
   const userPlaceholder = userInfo?.name?.split(" ").map((n: string) => n[0]).join("");
 
+  // Process skills - handle both array and comma-separated string formats
+  const skillsList = (() => {
+    if (!userInfo?.skills) return [];
+    if (Array.isArray(userInfo.skills)) return userInfo.skills;
+    if (typeof (userInfo.skills as any) === 'string') {
+      return (userInfo.skills as string).split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  })();
 
   return (
     <Card className="border-primary/5 shadow-2xl rounded-[2.5rem] overflow-hidden bg-background">
@@ -96,10 +105,7 @@ const Leftside: React.FC<PersonalInformationProps> = () => {
         <div className="mt-10 pt-10 border-t border-secondary">
           <h3 className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] mb-6">Strategic Skills</h3>
           <div className="flex flex-wrap gap-2">
-            {(Array.isArray(userInfo?.skills)
-              ? userInfo.skills
-              : userInfo?.skills?.split(',').map((s: string) => s.trim()).filter(Boolean) || []
-            ).map((skill: string, index: number) => (
+            {skillsList.map((skill: string, index: number) => (
               <Badge
                 key={index}
                 variant="outline"

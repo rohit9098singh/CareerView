@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -50,7 +50,7 @@ const ApplicantsTable: React.FC = () => {
   const params = useParams();
   const jobId = params.id as string;
 
-  const fetchApplicants = async () => {
+  const fetchApplicants = useCallback(async () => {
     try {
       const response = await getApplicationsByJobId(jobId);
       if (response?.status === "success") {
@@ -59,11 +59,11 @@ const ApplicantsTable: React.FC = () => {
     } catch (error: any) {
       console.log("Error fetching applicants", error);
     }
-  };
+  }, [jobId]);
 
   useEffect(() => {
     fetchApplicants();
-  }, [jobId]);
+  }, [jobId, fetchApplicants]);
 
   const handleStatusChange = async (newStatus: string, applicantId: string) => {
     try {

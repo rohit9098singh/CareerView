@@ -9,7 +9,7 @@ const FaqSection = () => {
         <AccordionItem value="item-1" className="border-secondary">
           <AccordionTrigger className="text-left font-bold text-foreground py-4 hover:text-primary transition-colors">How do I apply for a job?</AccordionTrigger>
           <AccordionContent className="text-muted-foreground font-medium pb-4">
-            Click the "View Details" button on any job listing. You'll be directed to the job details page where you can submit your application.
+            Click the &quot;View Details&quot; button on any job listing. You&apos;ll be directed to the job details page where you can submit your application.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2" className="border-secondary">
@@ -21,7 +21,7 @@ const FaqSection = () => {
         <AccordionItem value="item-3" className="border-secondary">
           <AccordionTrigger className="text-left font-bold text-foreground py-4 hover:text-primary transition-colors">How can I track applications?</AccordionTrigger>
           <AccordionContent className="text-muted-foreground font-medium pb-4">
-            All your applications are tracked in the "Applied Jobs" section. You can see real-time status updates from employers.
+            All your applications are tracked in the &quot;Applied Jobs&quot; section. You can see real-time status updates from employers.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-4">

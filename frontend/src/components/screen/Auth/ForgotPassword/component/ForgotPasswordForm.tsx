@@ -66,7 +66,7 @@ const ForgotPasswordForm = () => {
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-black text-foreground tracking-tight italic mb-3">Forgot password?</h2>
                   <p className="text-muted-foreground text-base font-medium">
-                    Enter your email and we'll send you a link to reset your password.
+                    Enter your email and we&apos;ll send you a link to reset your password.
                   </p>
                 </div>
 
@@ -132,7 +132,7 @@ const ForgotPasswordForm = () => {
                 </div>
                 <h3 className="text-2xl font-black text-foreground tracking-tight italic mb-4">Reset Link Sent</h3>
                 <p className="text-muted-foreground text-base font-medium mb-8 leading-relaxed">
-                  We've sent a password reset link to your email. Please check your inbox and follow the instructions.
+                  We&apos;ve sent a password reset link to your email. Please check your inbox and follow the instructions.
                 </p>
                 <Button
                   onClick={handleBackToForm}

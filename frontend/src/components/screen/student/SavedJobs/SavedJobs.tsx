@@ -77,7 +77,7 @@ const SavedJobs = () => {
                 </div>
                 <h1 className='text-5xl font-black text-foreground mb-4 tracking-tight italic'>Saved Opportunities</h1>
                 <p className='text-muted-foreground text-lg font-medium max-w-2xl'>
-                    Keep track of the roles that spark your interest and apply when you're ready to make your move.
+                    Keep track of the roles that spark your interest and apply when you&apos;re ready to make your move.
                 </p>
             </div>
 
@@ -171,7 +171,7 @@ const SavedJobs = () => {
                             </div>
                             <h3 className="text-3xl font-black text-foreground tracking-tight italic mb-3">Your list is empty</h3>
                             <p className="text-muted-foreground font-medium max-w-xs mx-auto mb-10 leading-relaxed">
-                                You haven't saved any roles yet. Explore the marketplace to find your next move.
+                                You haven&apos;t saved any roles yet. Explore the marketplace to find your next move.
                             </p>
                             <Button
                                 asChild
