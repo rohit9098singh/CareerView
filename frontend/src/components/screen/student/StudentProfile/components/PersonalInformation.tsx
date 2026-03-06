@@ -41,10 +41,10 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
       phoneNumber: "",
       location: "",
       bio: "",
-      // skills: [""],
+      skills: "",
       studyingAt: "",
-      resumeUrl: "",
-      profilePicture: ""
+      // File inputs should not have default values
+      // resumeUrl and profilePicture are excluded
     },
   })
   useEffect(() => {
@@ -56,7 +56,7 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
         if (response?.status === "success" && response?.data) {
           const data = response.data;
           setUserProfile(data);
-          // form.reset(data);
+          // File inputs (resumeUrl, profilePicture) excluded from reset
           form.reset({
             name: data.name || "",
             email: data.email || "",
@@ -65,8 +65,6 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
             bio: data.bio || "",
             skills: Array.isArray(data.skills) ? data.skills.join(", ") : data.skills || "",
             studyingAt: data.studyingAt || "",
-            resumeUrl: data.resumeUrl || "",
-            profilePicture: data.profilePicture || ""
           });
         }
       } catch (error: any) {
@@ -79,19 +77,25 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
 
   const onSubmit = async (data: personalInfoInput) => {
     try {
+      console.log("=== SUBMITTING PROFILE UPDATE ===");
+      console.log("Form data:", data);
+      
       const response: any = await editProfile(data);
+      
+      console.log("Edit profile response:", response);
+      
       if (response.status === "success") {
-        toast.success("Profile updated successfully");
+        toast.success(response?.message || "Profile updated successfully");
         setIsEditMode(false);
         setTimeout(() => {
           window.location.reload();
         }, 800);
-      }
-      else {
-        toast.error("Error updating the profile please try again later")
+      } else {
+        toast.error(response?.message || "Error updating the profile please try again later");
       }
     } catch (error: any) {
-      toast.error(error.message || "Error while Editing")
+      console.error("Profile update error:", error);
+      toast.error(error.message || "Error while Editing");
     }
   }
 
@@ -227,7 +231,7 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
               <FormField
                 control={form.control}
                 name="resumeUrl"
-                render={({ field }) => (
+                render={({ field: { value, onChange, ...field } }) => (
                   <FormItem className="space-y-4">
                     <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground">Primary Resume (PDF)</FormLabel>
                     <FormControl>
@@ -235,9 +239,10 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
                         <Input
                           type="file"
                           accept=".pdf"
-                          onChange={(e) => field.onChange(e.target.files)}
+                          onChange={(e) => onChange(e.target.files)}
                           disabled={!isEditMode}
                           className="h-32 border-2 border-dashed border-secondary hover:border-primary/30 transition-all rounded-[2rem] bg-secondary/10 file:hidden cursor-pointer"
+                          {...field}
                         />
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                           <LayoutList className="h-8 w-8 text-primary/40 mb-2 group-hover/file:scale-110 transition-transform" />
@@ -253,7 +258,7 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
               <FormField
                 control={form.control}
                 name="profilePicture"
-                render={({ field }) => (
+                render={({ field: { value, onChange, ...field } }) => (
                   <FormItem className="space-y-4">
                     <FormLabel className="text-xs font-black uppercase tracking-widest text-muted-foreground">Avatar Update</FormLabel>
                     <FormControl>
@@ -261,9 +266,10 @@ const PersonalInformation: React.FC<PersonalInformationProps> = ({ setUserProfil
                         <Input
                           type="file"
                           accept="image/*"
-                          onChange={(e) => field.onChange(e.target.files)}
+                          onChange={(e) => onChange(e.target.files)}
                           disabled={!isEditMode}
                           className="h-32 border-2 border-dashed border-secondary hover:border-primary/30 transition-all rounded-[2rem] bg-secondary/10 file:hidden cursor-pointer"
+                          {...field}
                         />
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                           <User className="h-8 w-8 text-primary/40 mb-2 group-hover/file:scale-110 transition-transform" />

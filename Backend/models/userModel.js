@@ -33,7 +33,6 @@ const userSchema = new Schema({
   resumeUrl: { type: String },
   bio: { type: String },
   skills: [{ type: String }],
-  studyingAt: { type: String },
   savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],
   role: { type: String, enum: ["user", "admin"], default: "user" },
   appliedJobs: [appliedJobSchema],

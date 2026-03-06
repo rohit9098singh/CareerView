@@ -179,10 +179,24 @@ export const editJob = async (req, res) => {
 
 export const getAllJobs=async(req,res)=>{
      try {
-           const jobs=await Job.find();
+           const userId = req.id;
+           const user = await User.findById(userId);
 
-           if(!jobs || !jobs.length===0 ){
-            return response(res,200,"job not found ",[]);
+           if (!user) {
+             return response(res, 404, "User not found");
+           }
+
+           // If admin, only return jobs posted by them
+           // If regular user, return all active jobs
+           let jobs;
+           if (user.role === "admin") {
+             jobs = await Job.find({ postedBy: userId });
+           } else {
+             jobs = await Job.find({ JobStatus: "active" });
+           }
+
+           if(!jobs || jobs.length === 0 ){
+            return response(res,200,"No jobs found",[]);
            }
            return response(res,200,"All jobs fetched successfully",jobs)
      } catch (error) {
@@ -192,7 +206,7 @@ export const getAllJobs=async(req,res)=>{
 
 export const getLatestJobs = async (req, res) => {
   try {
-    const latestJobs = await Job.find()
+    const latestJobs = await Job.find({ JobStatus: "active" })
       .sort({ createdAt: -1 }) 
       .limit(10);
 
@@ -493,23 +507,33 @@ export const studentApplicationStats = async (req, res) => {
 
 export const adminStats=async(req,res)=>{
      try {
-       const totalJobs=await Job.countDocuments();
-       const activeJobs = await Job.countDocuments({ JobStatus: "active" });
+       const adminId = req.id;
+       const admin = await User.findById(adminId);
 
-       const allUser=await User.find();
-       console.log(allUser)
+       if (!admin) {
+         return response(res, 404, "Admin not found");
+       }
 
-       let totalApplicants=0;
-       let pendingReview=0;
+       if (admin.role !== "admin") {
+         return response(res, 403, "Access denied. Only admins can view these stats.");
+       }
 
-       allUser.forEach(user=>{
-        totalApplicants +=user.appliedJobs.length;
+       // Count only jobs posted by this admin
+       const totalJobs = await Job.countDocuments({ postedBy: adminId });
+       const activeJobs = await Job.countDocuments({ postedBy: adminId, JobStatus: "active" });
 
-        user.appliedJobs.forEach(appliedJob=>{
-          if(appliedJob.status.toLowerCase()==="applied"){
-            pendingReview++;
-          }
-        })
+       // Get only jobs posted by this admin
+       const adminJobs = await Job.find({ postedBy: adminId }).select("_id");
+       const adminJobIds = adminJobs.map(job => job._id);
+
+       // Count applications only for this admin's jobs
+       const totalApplicants = await JobApplication.countDocuments({ 
+         jobId: { $in: adminJobIds } 
+       });
+
+       const pendingReview = await JobApplication.countDocuments({ 
+         jobId: { $in: adminJobIds },
+         status: "applied"
        });
 
        return response(res,200,"Admin DashBoard stats",{

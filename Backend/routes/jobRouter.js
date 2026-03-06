@@ -39,7 +39,7 @@ router.post("/edit-profile",authenticateUser,multerMiddleware.fields([
   { name: 'profilePicture', maxCount: 1 } 
 ]),editProfile)
 router.post("/edit-admin-profile",authenticateUser,multerMiddleware.fields([{name:"profilePicture",maxCount:1}]),editAdminProfile)
-router.get("/get-top-performing-jobs",getTopPerformingJobs)
+router.get("/get-top-performing-jobs",authenticateUser,getTopPerformingJobs)
 
 router.get('/applications', authenticateUser, getAllApplications);
 

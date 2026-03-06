@@ -9,8 +9,13 @@ export interface InputProps
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, value: propValue, defaultValue, onChange, ...props }, ref) => {
-    // Only pass value prop if it's explicitly provided
-    const inputProps = propValue !== undefined ? { value: propValue, onChange } : { defaultValue };
+    // File inputs must never be controlled (no value prop)
+    // For other inputs, only pass value prop if it's explicitly provided and not undefined/null
+    const inputProps = type === 'file' 
+      ? { onChange } 
+      : propValue !== undefined && propValue !== null
+        ? { value: propValue, onChange }
+        : { defaultValue: defaultValue ?? '', onChange };
 
     return (
       <input

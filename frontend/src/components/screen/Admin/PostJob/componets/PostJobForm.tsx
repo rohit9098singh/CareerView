@@ -59,36 +59,51 @@ const PostJobForm = () => {
       applicationDeadLine: "",
       companyBenefits: "",
       aboutCompany: "",
+      tag: "",
     },
   });
 
 
   const onSubmit = async (data: PostFormInput) => {
-    // Manually validate the logo file since it's outside RHF
-    if (!selectedLogo) {
-      setLogoError("Company logo is required");
-      return;
-    }
-    if (selectedLogo.size > 5 * 1024 * 1024) {
-      setLogoError("Max file size is 5MB");
-      return;
-    }
-    const accepted = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-    if (!accepted.includes(selectedLogo.type)) {
-      setLogoError("Only .jpg, .jpeg, .png, .webp and .gif formats are supported");
-      return;
-    }
-    setLogoError("");
+    try {
+      // Manually validate the logo file since it's outside RHF
+      if (!selectedLogo) {
+        setLogoError("Company logo is required");
+        toast.error("Company logo is required");
+        return;
+      }
+      if (selectedLogo.size > 5 * 1024 * 1024) {
+        setLogoError("Max file size is 5MB");
+        toast.error("Max file size is 5MB");
+        return;
+      }
+      const accepted = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+      if (!accepted.includes(selectedLogo.type)) {
+        setLogoError("Only .jpg, .jpeg, .png, .webp and .gif formats are supported");
+        toast.error("Only image formats are supported");
+        return;
+      }
+      setLogoError("");
 
-    const responseData = await postJob({ ...data, logo: selectedLogo });
+      console.log("Submitting job with data:", { ...data, logoName: selectedLogo.name });
+      
+      const responseData = await postJob({ ...data, logo: selectedLogo });
 
-    if (responseData?.status === "success" || responseData?.data) {
-      toast.success("Opportunity broadcasted successfully");
-      form.reset();
-      setSelectedLogo(null);
-      if (logoInputRef.current) logoInputRef.current.value = "";
-    } else {
-      toast.error(responseData?.message || "Protocol failure: Unable to post job");
+      console.log("Response from postJob:", responseData);
+
+      if (responseData?.status === "success" || responseData?.data) {
+        toast.success(responseData?.message || "Opportunity broadcasted successfully");
+        form.reset();
+        setSelectedLogo(null);
+        if (logoInputRef.current) logoInputRef.current.value = "";
+      } else {
+        const errorMessage = responseData?.message || "Protocol failure: Unable to post job";
+        console.error("Job posting failed:", errorMessage);
+        toast.error(errorMessage);
+      }
+    } catch (error: any) {
+      console.error("Error in onSubmit:", error);
+      toast.error(error?.message || "An unexpected error occurred");
     }
   }
 

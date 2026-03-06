@@ -16,6 +16,13 @@ axiosInstance.interceptors.request.use(
             config.headers['Authorization'] = `Bearer ${token}`;
             config.headers['x-user-role'] = user.role || '';
         }
+        
+        // Important: Don't set Content-Type for FormData requests
+        // Let axios set it automatically with the correct boundary
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
+        }
+        
         return config;
     },
     (error) => {

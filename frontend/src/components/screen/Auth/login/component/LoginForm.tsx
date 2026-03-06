@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { loginUser } from "@/components/services/auth.service"
 import toast from "react-hot-toast"
+import { useAuth } from "@/context/AuthContext"
 
 type LoginInput = z.infer<typeof loginSchema>
 
@@ -27,6 +28,7 @@ const LoginForm = () => {
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const router = useRouter()
+    const { login: loginContext } = useAuth()
 
     const form = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
@@ -43,15 +45,17 @@ const LoginForm = () => {
             const { token, role, name, email } = response.data;
 
             if (role === "user" || role === "admin") {
-                // Store token and user data
-                localStorage.setItem('token', token);
-                localStorage.setItem('user', JSON.stringify({ name, email, role }));
+                // Update AuthContext state
+                loginContext(token, { name, email, role });
 
                 // Show success message
                 toast.success(`${role === 'user' ? 'User' : 'Admin'} logged in successfully!`);
 
-                // Redirect based on role
-                router.push(role === 'user' ? "/student/Home" : "/admin/Home");
+                // Small delay to ensure state is updated, then navigate
+                setTimeout(() => {
+                    // Use window.location for full page reload to ensure all components see updated auth state
+                    window.location.href = role === 'user' ? "/student/Home" : "/admin/Home";
+                }, 100);
             } else {
                 toast.error("Invalid role");
             }

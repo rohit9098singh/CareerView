@@ -139,6 +139,11 @@ export const logout = async (req, res) => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+    
+    if (!email) {
+      return response(res, 400, "Email is required");
+    }
+    
     const user = await User.findOne({ email });
     if (!user) {
       return response(res, 400, "No account found with this email");
@@ -150,14 +155,27 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = new Date(Date.now() + 3600000);
     await user.save();
 
-    await sendResetPasswordLinkToEmail(user.email, resetPasswordToken);
-
-    return response(
-      res,
-      200,
-      "A password reset link has been send to your email address"
-    );
+    try {
+      await sendResetPasswordLinkToEmail(user.email, resetPasswordToken);
+      return response(
+        res,
+        200,
+        "A password reset link has been sent to your email address"
+      );
+    } catch (emailError) {
+      console.error("Failed to send reset email:", emailError);
+      // Reset the token since email failed
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      return response(
+        res,
+        500,
+        "Failed to send reset email. Please check your email configuration and try again."
+      );
+    }
   } catch (error) {
+    console.error("Forgot password error:", error);
     return response(res, 500, "Internal server error", error.message);
   }
 };

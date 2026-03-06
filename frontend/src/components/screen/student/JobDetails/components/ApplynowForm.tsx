@@ -28,9 +28,11 @@ const ApplynowForm = () => {
     const jobId = params.id as string;
 
     const [loading, setLoading] = useState(false);
+    const [selectedFileName, setSelectedFileName] = useState<string>("");
 
     const form = useForm<ApplyInput>({
         resolver: zodResolver(ApplynowFormSchema),
+        mode: "onChange",
         defaultValues: {
             resume: undefined,
             coverLetter: "",
@@ -44,15 +46,24 @@ const ApplynowForm = () => {
         }
 
         try {
+            console.log("=== SUBMITTING JOB APPLICATION ===");
+            console.log("Job ID:", jobId);
+            console.log("Application data:", data);
+            console.log("Resume file:", data.resume);
+            
             setLoading(true);
             const response = await applyJob(jobId, data);
+            
+            console.log("Apply job response:", response);
+            
             if (response.status === "success") {
-                toast.success("Job applied successfully! Good luck.");
+                toast.success(response?.message || "Job applied successfully! Good luck.");
                 form.reset();
             } else {
                 toast.error(response.message || "Failed to apply");
             }
         } catch (error: any) {
+            console.error("Job application error:", error);
             toast.error(error.message || "Error while applying");
         } finally {
             setLoading(false);
@@ -71,7 +82,7 @@ const ApplynowForm = () => {
                         <Sparkles className="h-8 w-8 text-primary" />
                         Complete Your Pitch
                     </h1>
-                    <p className="text-muted-foreground font-medium mt-1">Show them why you're the perfect fit.</p>
+                    <p className="text-muted-foreground font-medium mt-1">Show them why you&apos;re the perfect fit.</p>
                 </div>
             </div>
 
@@ -85,7 +96,7 @@ const ApplynowForm = () => {
                     <FormField
                         control={form.control}
                         name="resume"
-                        render={({ field }) => (
+                        render={({ field: { onChange, value, ...field } }) => (
                             <FormItem className="space-y-4">
                                 <FormLabel className="text-sm font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                                     <FileUp className="h-4 w-4 text-primary" />
@@ -97,12 +108,22 @@ const ApplynowForm = () => {
                                             type="file"
                                             accept=".pdf"
                                             onChange={(e) => {
-                                                if (e.target.files) {
-                                                    field.onChange(e.target.files);
+                                                const files = e.target.files;
+                                                if (files && files.length > 0) {
+                                                    onChange(files);
+                                                    setSelectedFileName(files[0].name);
+                                                    // Clear any validation errors
+                                                    form.clearErrors("resume");
                                                 }
                                             }}
                                             className="h-14 py-4 px-6 border-2 border-dashed border-secondary hover:border-primary/50 transition-all rounded-2xl cursor-pointer file:bg-primary file:text-white file:rounded-lg file:font-black file:uppercase file:text-[10px] file:mr-4 file:px-4"
+                                            {...field}
                                         />
+                                        {selectedFileName && (
+                                            <p className="mt-2 text-sm text-green-600 font-medium flex items-center gap-2">
+                                                ✓ {selectedFileName}
+                                            </p>
+                                        )}
                                     </div>
                                 </FormControl>
                                 <FormMessage />
